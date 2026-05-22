@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calamari Collective — Coming Soon</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { background: #fff; }
+  body {
+    background: #fff; color: #000;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    min-height: 100vh;
+  }
+  #page-cover {
+    position: fixed; inset: 0; background: #000;
+    z-index: 9999; pointer-events: none;
+  }
+  nav {
+    position: fixed; inset: 0; pointer-events: none; z-index: 200;
+    mix-blend-mode: difference;
+  }
+  nav a {
+    position: absolute; pointer-events: all;
+    font-size: clamp(11px, 1.1vw, 14px); letter-spacing: 0.04em;
+    text-transform: lowercase; text-decoration: none; color: #fff;
+    line-height: 1; padding: clamp(20px, 3vw, 36px);
+    transition: opacity 0.2s;
+  }
+  nav a:hover { opacity: 0.45; }
+  .tl { top: 0; left: 0; } .tr { top: 0; right: 0; }
+  .bl { bottom: 0; left: 0; } .br { bottom: 0; right: 0; }
+  #nav-logo {
+    position: absolute; top: 0; left: 50%;
+    transform: translateX(-50%);
+    padding: clamp(16px, 2.4vw, 28px);
+    pointer-events: all;
+    display: flex; align-items: flex-start;
+  }
+  #nav-logo img {
+    height: clamp(22px, 3.2vh, 36px);
+    width: auto; display: block;
+    filter: brightness(0) invert(1);
+  }
+  .hero {
+    width: 100%; height: 80vh;
+    background: #e8e8e8;
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  main {
+    padding: clamp(40px, 6vh, 72px) clamp(24px, 5vw, 80px)
+             clamp(100px, 14vh, 160px);
+    max-width: 900px;
+  }
+  .client-name {
+    font-size: clamp(9px, 0.8vw, 11px);
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: rgba(0,0,0,0.4);
+    display: block; margin-bottom: clamp(10px, 1.4vh, 16px);
+  }
+  .project-title {
+    font-size: clamp(36px, 7vw, 96px);
+    font-weight: bold; letter-spacing: -0.02em; line-height: 1.0;
+    margin-bottom: clamp(8px, 1vh, 14px);
+  }
+  .project-year {
+    font-size: clamp(10px, 0.9vw, 13px);
+    letter-spacing: 0.1em; color: rgba(0,0,0,0.35);
+    display: block; margin-bottom: clamp(28px, 5vh, 52px);
+  }
+  .divider {
+    border: none;
+    border-top: 1px solid rgba(0,0,0,0.1);
+    margin-bottom: clamp(28px, 5vh, 52px);
+  }
+  .credits {
+    display: grid;
+    grid-template-columns: clamp(90px, 10vw, 130px) 1fr;
+    gap: clamp(10px, 1.5vh, 14px) clamp(20px, 2.5vw, 36px);
+    margin-bottom: clamp(48px, 8vh, 96px);
+    max-width: 560px;
+  }
+  .credit-label {
+    font-size: clamp(9px, 0.75vw, 11px);
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: rgba(0,0,0,0.35); padding-top: 2px;
+  }
+  .credit-value {
+    font-size: clamp(12px, 1vw, 15px);
+    color: rgba(0,0,0,0.75); line-height: 1.5;
+  }
+  .credits-divider {
+    border: none;
+    border-top: 1px solid rgba(0,0,0,0.08);
+    margin: clamp(18px, 2.5vh, 28px) 0;
+    max-width: 560px;
+    grid-column: 1 / -1;
+  }
+  .credit-desc {
+    grid-column: 1 / -1;
+    font-size: clamp(13px, 1.05vw, 16px);
+    line-height: 1.75; color: rgba(0,0,0,0.55);
+    max-width: 560px;
+  }
+</style>
+</head>
+<body>
+
+<div id="page-cover"></div>
+
+<nav>
+  <a href="index.html" class="tl" id="nav-works">gallery</a>
+  <a href="video.html" class="tr" id="nav-video">works</a>
+  <a href="photo.html" class="bl">who we are</a>
+  <a href="contact.html" class="br">talk to us</a>
+  <a href="index.html" id="nav-logo">
+    <img src="calamari-symbol-negative.svg" alt="Calamari Collective">
+  </a>
+</nav>
+
+<div class="hero"></div>
+
+<main>
+  <span class="client-name">agency production 003</span>
+  <h1 class="project-title">Coming Soon</h1>
+  <span class="project-year">—</span>
+
+  <hr class="divider">
+
+  <div class="credits">
+    <span class="credit-label">Director</span>
+    <span class="credit-value">Coming soon</span>
+
+    <span class="credit-label">Producer</span>
+    <span class="credit-value">Coming soon</span>
+
+    <span class="credit-label">Editor</span>
+    <span class="credit-value">Coming soon</span>
+
+    <span class="credit-label">Videographer</span>
+    <span class="credit-value">Coming soon</span>
+
+    <span class="credit-label">Date</span>
+    <span class="credit-value">Coming soon</span>
+
+    <hr class="credits-divider">
+
+    <p class="credit-desc">Coming soon.</p>
+  </div>
+</main>
+
+<script>
+(function() {
+  var cover = document.getElementById('page-cover');
+  gsap.to(cover, { opacity: 0, duration: 0.5, ease: 'power2.out', delay: 0.05,
+    onComplete: function() { cover.style.display = 'none'; }
+  });
+
+  function fadeOut(dest) {
+    cover.style.display = '';
+    gsap.fromTo(cover, { opacity: 0 }, {
+      opacity: 1, duration: 0.4, ease: 'power2.in',
+      onComplete: function() { window.location.href = dest; }
+    });
+  }
+
+  document.getElementById('nav-works').addEventListener('click', function(e) {
+    e.preventDefault(); fadeOut('index.html');
+  });
+  document.getElementById('nav-video').addEventListener('click', function(e) {
+    e.preventDefault(); fadeOut('video.html');
+  });
+  document.getElementById('nav-logo').addEventListener('click', function(e) {
+    e.preventDefault(); fadeOut('index.html');
+  });
+  document.querySelector('nav a.bl').addEventListener('click', function(e) {
+    e.preventDefault(); fadeOut('photo.html');
+  });
+  document.querySelector('nav a.br').addEventListener('click', function(e) {
+    e.preventDefault(); fadeOut('contact.html');
+  });
+})();
+</script>
+
+</body>
+</html>

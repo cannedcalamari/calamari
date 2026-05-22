@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calamari Collective — Video</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { background: #fff; }
+  body {
+    background: #fff; color: #000;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    min-height: 100vh;
+  }
+
+  /* ── Page cover ── */
+  #page-cover {
+    position: fixed; inset: 0; background: #000;
+    z-index: 9999; pointer-events: none;
+  }
+
+  /* content scrolls, top-bar clips it */
+  main { position: relative; z-index: 1; }
+
+  /* ── Top nav bar ── */
+  #top-bar {
+    position: fixed; top: 0; left: 0; right: 0;
+    height: clamp(60px, 8.5vh, 90px);
+    background: #fff;
+    z-index: 150;
+    border-bottom: 1px solid transparent;
+  }
+
+  /* ── Nav ── */
+  nav {
+    position: fixed; inset: 0; pointer-events: none; z-index: 200;
+    mix-blend-mode: difference;
+  }
+  nav a {
+    position: absolute; pointer-events: all;
+    font-size: clamp(11px, 1.1vw, 14px); letter-spacing: 0.04em;
+    text-transform: lowercase; text-decoration: none; color: #fff;
+    line-height: 1; padding: clamp(20px, 3vw, 36px);
+    transition: opacity 0.2s;
+  }
+  nav a:hover { opacity: 0.45; }
+  nav a.active { opacity: 0.3; pointer-events: none; }
+  .tl { top: 0; left: 0; }
+  .tr { top: 0; right: 0; }
+  .bl { bottom: 0; left: 0; }
+  .br { bottom: 0; right: 0; }
+
+  /* small logo top-centre */
+  #nav-logo {
+    position: absolute; top: 0; left: 50%;
+    transform: translateX(-50%);
+    padding: clamp(16px, 2.4vw, 28px);
+    pointer-events: all;
+    display: flex; align-items: flex-start;
+  }
+  #nav-logo img {
+    height: clamp(22px, 3.2vh, 36px);
+    width: auto; display: block;
+    filter: brightness(0);
+  }
+
+  /* ── Main content ── */
+  main {
+    padding-top: clamp(60px, 8.5vh, 90px);
+    padding-bottom: clamp(72px, 10vh, 110px);
+  }
+
+  /* ── Project row ── */
+  .project-row {
+    display: flex; align-items: flex-start;
+    padding: clamp(16px, 2.5vh, 28px) clamp(16px, 2vw, 32px);
+    gap: clamp(24px, 4vw, 56px);
+  }
+  .project-info {
+    flex: 0 0 28%;
+    display: flex; flex-direction: column;
+    justify-content: flex-start;
+    padding-right: clamp(16px, 2vw, 32px);
+  }
+  .client-name {
+    font-size: clamp(9px, 0.8vw, 11px);
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: rgba(0,0,0,0.4);
+    margin-top: clamp(10px, 1.4vh, 16px);
+    margin-bottom: 0;
+  }
+  .project-title {
+    font-size: clamp(18px, 2.2vw, 32px);
+    font-weight: bold; letter-spacing: -0.02em; line-height: 1.05;
+    margin-bottom: clamp(10px, 1.4vh, 16px);
+    cursor: pointer; transition: opacity 0.2s;
+  }
+  .project-title:hover { opacity: 0.5; }
+  .project-info { cursor: pointer; }
+  .project-desc {
+    font-size: clamp(12px, 1vw, 14px);
+    line-height: 1.65; color: rgba(0,0,0,0.5);
+    margin-bottom: 0;
+  }
+
+  /* ── Horizontal scroll strip ── */
+  .project-media {
+    flex: 1; overflow: hidden;
+    display: flex; align-items: center;
+  }
+  .scroll-strip {
+    overflow-x: auto; overflow-y: hidden;
+    cursor: grab; user-select: none;
+    scrollbar-width: none; -ms-overflow-style: none;
+  }
+  .scroll-strip::-webkit-scrollbar { display: none; }
+  .scroll-strip.grabbing { cursor: grabbing; }
+  .scroll-track {
+    display: flex;
+    gap: clamp(10px, 1.2vw, 16px);
+    padding-right: clamp(10px, 1.2vw, 16px);
+  }
+  .media-card {
+    flex-shrink: 0;
+    height: clamp(200px, 46vh, 520px);
+    aspect-ratio: 16/9;
+    background: #e8e8e8;
+    position: relative; overflow: hidden;
+    cursor: pointer;
+  }
+  .media-card:hover { background: #ddd; }
+  /* subtle grid texture on placeholder */
+  .media-card::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  /* ── Divider ── */
+  .divider {
+    border: none;
+    border-top: 1px solid transparent;
+    margin: 0;
+  }
+</style>
+</head>
+<body>
+
+<div id="page-cover"></div>
+<div id="top-bar"></div>
+
+<nav>
+  <a href="index.html" class="tl" id="nav-works">gallery</a>
+  <a href="video.html" class="tr active">video</a>
+  <a href="photo.html" class="bl">who we are</a>
+  <a href="contact.html" class="br">talk to us</a>
+  <a href="index.html" id="nav-logo">
+    <img src="calamari-symbol-negative.svg" alt="Calamari Collective">
+  </a>
+</nav>
+
+<main>
+
+  <!-- Project 1 — Karma -->
+  <div class="project-row">
+    <div class="project-info">
+      <h2 class="project-title" data-href="project.html">Karma Campaign</h2>
+      <p class="project-desc">Our first agency production — a kinetic study of movement and raw energy, shot over three days in an industrial space for Karma.</p>
+      <span class="client-name">agency production 001</span>
+    </div>
+    <div class="project-media">
+      <div class="scroll-strip">
+        <div class="scroll-track">
+          <div class="media-card"><video src="karma/karmacompressed.mp4" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:block;"></video></div>
+          <div class="media-card"><img src="karma/DSC00011-2.png" alt="" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+          <div class="media-card"><img src="karma/DSC003612.png" alt="" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+          <div class="media-card"><img src="karma/DSC003622.png" alt="" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Project 2 — Zvuk -->
+  <div class="project-row">
+    <div class="project-info">
+      <h2 class="project-title" data-href="project-zvuk.html">Zvuk</h2>
+      <p class="project-desc">Kilian Conrad's solo production — a quiet, charged study of sound made visible. Every frame built to resonate.</p>
+      <span class="client-name">agency production 002</span>
+    </div>
+    <div class="project-media">
+      <div class="scroll-strip">
+        <div class="scroll-track">
+          <div class="media-card"><video src="zvuk/Untitled%20design.mp4" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:block;"></video></div>
+          <div class="media-card"><img src="zvuk/ZVUK3-102.jpg" alt="" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+          <div class="media-card"><img src="zvuk/ZVUK3-111.jpg" alt="" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+          <div class="media-card"><img src="zvuk/ZVUK3-115.jpg" alt="" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Project 3 — Coming Soon -->
+  <div class="project-row">
+    <div class="project-info">
+      <h2 class="project-title" data-href="project-coming-soon.html">Coming Soon</h2>
+      <p class="project-desc">Coming soon.</p>
+      <span class="client-name">agency production 003</span>
+    </div>
+    <div class="project-media">
+      <div class="scroll-strip">
+        <div class="scroll-track">
+          <div class="media-card"></div>
+          <div class="media-card"></div>
+          <div class="media-card"></div>
+          <div class="media-card"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+(function() {
+
+  /* ── Entrance ── */
+  var cover = document.getElementById('page-cover');
+  gsap.to(cover, { opacity: 0, duration: 0.5, ease: 'power2.out', delay: 0.05,
+    onComplete: function() { cover.style.display = 'none'; }
+  });
+
+  /* ── Fade-out helper for nav links ── */
+  function fadeOut(dest) {
+    cover.style.display = '';
+    gsap.fromTo(cover, { opacity: 0 }, {
+      opacity: 1, duration: 0.4, ease: 'power2.in',
+      onComplete: function() { window.location.href = dest; }
+    });
+  }
+
+  document.getElementById('nav-works').addEventListener('click', function(e) {
+    e.preventDefault(); fadeOut('index.html');
+  });
+  document.getElementById('nav-logo').addEventListener('click', function(e) {
+    e.preventDefault(); fadeOut('index.html');
+  });
+  document.querySelector('nav a.bl').addEventListener('click', function(e) {
+    e.preventDefault(); fadeOut('photo.html');
+  });
+  document.querySelector('nav a.br').addEventListener('click', function(e) {
+    e.preventDefault(); fadeOut('contact.html');
+  });
+
+  /* ── Project info + media card clicks ── */
+  document.querySelectorAll('.project-row').forEach(function(row) {
+    var href = row.querySelector('.project-title').dataset.href;
+    if (!href) return;
+    row.querySelector('.project-info').addEventListener('click', function() {
+      fadeOut(href);
+    });
+  });
+
+  /* ── Drag-to-scroll on strips (with click-through to project) ── */
+  document.querySelectorAll('.scroll-strip').forEach(function(strip) {
+    var down = false, startX, scrollLeft, dragged = false;
+    strip.addEventListener('mousedown', function(e) {
+      down = true; dragged = false;
+      startX = e.pageX - strip.offsetLeft;
+      scrollLeft = strip.scrollLeft; strip.classList.add('grabbing');
+    });
+    window.addEventListener('mouseup', function() {
+      down = false; strip.classList.remove('grabbing');
+    });
+    strip.addEventListener('mousemove', function(e) {
+      if (!down) return; e.preventDefault();
+      var x = e.pageX - strip.offsetLeft;
+      if (Math.abs(x - startX) > 5) dragged = true;
+      strip.scrollLeft = scrollLeft - (x - startX) * 1.4;
+    });
+    strip.addEventListener('click', function() {
+      if (dragged) return;
+      var href = strip.closest('.project-row').querySelector('.project-title').dataset.href;
+      if (href) fadeOut(href);
+    });
+  });
+
+})();
+</script>
+
+<script>
+(function() {
+  var SVG_W = 58.23, SVG_H = 53.45;
+  var SVG_PATH = 'M8.92,34.93c2.48.76,6.04,2.69,4.92,5.57-1.01,2.36-3.2,3.86-5.02,5.79-1.29,1.18-3.78,4.15-2.31,5.4,2.5,1.23,5.92-3.4,8.37-4.66,4.08-2.54,5.22,1.37,9.38,2.29,1.62.36,1.57.22,2.68.14.97-.08,2.16-2.64,2.79-3.5.91-1.41,2.17-.77,3.56-.12,2.43,1.14,15.38,8.22,17.51,7.56,8.1-2.53,5.35-6.56,4.08-7.62-3.74-3.14-15.13-2.15-17-6.09-1.19-2.52,2.38-5.11,2.7-7.88.4-2.49-.52-5.3.72-7.62.98-1.84,3.51-2.36,5.03-.72.57.58.97,1.3,1.31,2.08.78,1.77,1.22,3.99,2.43,5.4,1.28,1.59,3.51,1.59,5.09.5,5.75-3.93,2.55-15.79-2.4-19.08-4.22-3.01-8.94-.46-12.37-2.68-2.73-1.88-2.79-6.45-5.12-8.72-.83-.85-2.08-1.39-3.02-.57-1.79,1.93.03,5.98-.47,8.65-.41,3.59-3.18,5.36-6.51,3.48-2.26-1.29-4.11-3.21-6.11-5.02-1.24-1.12-2.62-2.17-4.27-2.51-2.01-.48-4.23.65-3.18,2.53.76,1.38,2.05,2.46,3.01,3.78,1.24,1.54,2.37,4.09,1.65,5.85-.41,1.13-1.46,1.58-2.53,1.43-1.68-.16-3.62-1.39-5.41-1.01-2.08.54-1.69,2.89-.38,4.08,1.95,1.85,4.87,2.76,6.77,4.6.39.41,1.11,1.05.77,1.58-.37.46-2.01.3-3.94.03-2.05-.27-4.18-.6-6.26-.49-2,.01-4.67,1.1-5.24,2.72-.26.64-.18,1.36.25,1.92,1.87,2.07,5.64,1.85,8.47,2.9h.05Z';
+
+  var TEX_PAD = 0.18, TEX_W = 1024;
+  var TEX_H = Math.round(TEX_W * SVG_H / SVG_W);
+  var off = document.createElement('canvas');
+  off.width = TEX_W; off.height = TEX_H;
+  var c2 = off.getContext('2d');
+  c2.save();
+  c2.translate(TEX_W * TEX_PAD, TEX_H * TEX_PAD);
+  c2.scale(TEX_W * (1 - 2 * TEX_PAD) / SVG_W, TEX_H * (1 - 2 * TEX_PAD) / SVG_H);
+  c2.fillStyle = '#000000';
+  c2.fill(new Path2D(SVG_PATH));
+  c2.restore();
+
+  var cvs = document.createElement('canvas');
+  cvs.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:201;filter:contrast(8);';
+  document.body.appendChild(cvs);
+
+  var gl = cvs.getContext('webgl', { alpha: true, premultipliedAlpha: false })
+          || cvs.getContext('experimental-webgl', { alpha: true, premultipliedAlpha: false });
+  if (!gl) return;
+
+  document.querySelector('#nav-logo img').style.display = 'none';
+
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+  function mkShader(type, src) {
+    var s = gl.createShader(type);
+    gl.shaderSource(s, src); gl.compileShader(s); return s;
+  }
+
+  var prog = gl.createProgram();
+  gl.attachShader(prog, mkShader(gl.VERTEX_SHADER,
+    'attribute vec2 aPos; attribute vec2 aUv; varying vec2 vUv;' +
+    'void main(){vUv=aUv;gl_Position=vec4(aPos,0.0,1.0);}'));
+  gl.attachShader(prog, mkShader(gl.FRAGMENT_SHADER,
+    'precision mediump float;' +
+    'uniform sampler2D uTex; uniform vec2 uMouse; uniform float uVelocity;' +
+    'uniform vec2 uLogoMin; uniform vec2 uLogoMax; uniform float uAspect;' +
+    'uniform float uTime; varying vec2 vUv;' +
+    'void main(){' +
+    '  vec2 uv=vUv;' +
+    '  vec2 d=uv-uMouse; d.x*=uAspect;' +
+    '  float dist=length(d);' +
+    '  float falloff=exp(-dist*dist/(2.0*0.4*0.4));' +
+    '  vec2 dir=(dist>0.001)?d/dist:vec2(0.0); dir.x/=uAspect;' +
+    '  vec2 s=uv+dir*uVelocity*falloff*0.008;' +
+    '  vec2 t=(s-uLogoMin)/(uLogoMax-uLogoMin);' +
+    '  if(t.x<0.0||t.x>1.0||t.y<0.0||t.y>1.0){gl_FragColor=vec4(0.0);return;}' +
+    '  t.x+=sin(t.y*3.8+uTime*1.05)*0.006+sin(t.y*7.2-uTime*0.68)*0.003;' +
+    '  t.y+=sin(t.x*3.1+uTime*0.82)*0.005+sin(t.x*6.5-uTime*1.18)*0.003;' +
+    '  vec4 tex=texture2D(uTex,t);' +
+    '  gl_FragColor=vec4(0.114,0.114,0.106,tex.a);' +
+    '}'));
+  gl.linkProgram(prog);
+  gl.useProgram(prog);
+
+  var buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+    -1,-1,0,0, 1,-1,1,0, -1,1,0,1,
+     1,-1,1,0, 1,1,1,1, -1,1,0,1
+  ]), gl.STATIC_DRAW);
+  var aPos = gl.getAttribLocation(prog, 'aPos');
+  var aUv  = gl.getAttribLocation(prog, 'aUv');
+  gl.enableVertexAttribArray(aPos); gl.enableVertexAttribArray(aUv);
+  gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 16, 0);
+  gl.vertexAttribPointer(aUv,  2, gl.FLOAT, false, 16, 8);
+
+  var uMouse_loc   = gl.getUniformLocation(prog, 'uMouse');
+  var uVel_loc     = gl.getUniformLocation(prog, 'uVelocity');
+  var uLogoMin_loc = gl.getUniformLocation(prog, 'uLogoMin');
+  var uLogoMax_loc = gl.getUniformLocation(prog, 'uLogoMax');
+  var uAspect_loc  = gl.getUniformLocation(prog, 'uAspect');
+  var uTime_loc    = gl.getUniformLocation(prog, 'uTime');
+
+  var tex = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, tex);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, off);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.uniform1i(gl.getUniformLocation(prog, 'uTex'), 0);
+  gl.clearColor(0, 0, 0, 0);
+
+  var logoW, logoH, logoX, logoY;
+
+  function resize() {
+    var w = innerWidth, h = innerHeight;
+    cvs.width  = w * devicePixelRatio;
+    cvs.height = h * devicePixelRatio;
+    cvs.style.width  = w + 'px';
+    cvs.style.height = h + 'px';
+    gl.viewport(0, 0, cvs.width, cvs.height);
+    gl.uniform1f(uAspect_loc, w / h);
+    var scaleToFit = Math.min(w / SVG_W, h / SVG_H) * 1.3;
+    logoW = SVG_W * scaleToFit * 0.048;
+    logoH = SVG_H * scaleToFit * 0.048;
+    logoX = (w - logoW) * 0.5;
+    logoY = 6;
+  }
+  resize();
+  addEventListener('resize', resize);
+
+  var rawX = 0.5, rawY = 0.5, lerpX = 0.5, lerpY = 0.5;
+  addEventListener('mousemove', function(e) {
+    rawX = e.clientX / innerWidth;
+    rawY = 1 - e.clientY / innerHeight;
+  });
+
+  (function loop() {
+    requestAnimationFrame(loop);
+    lerpX += (rawX - lerpX) * 0.04;
+    lerpY += (rawY - lerpY) * 0.04;
+    var dx = rawX - lerpX, dy = rawY - lerpY;
+    var vel = Math.min(Math.sqrt(dx*dx + dy*dy) * 14, 1.0);
+    var w = innerWidth, h = innerHeight;
+    gl.uniform2f(uMouse_loc, lerpX, lerpY);
+    gl.uniform1f(uVel_loc, vel);
+    gl.uniform1f(uTime_loc, performance.now() / 1000.0);
+    gl.uniform2f(uLogoMin_loc,  logoX / w,        1 - (logoY + logoH) / h);
+    gl.uniform2f(uLogoMax_loc, (logoX + logoW) / w, 1 - logoY / h);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
+  })();
+})();
+</script>
+
+</body>
+</html>

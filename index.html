@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calamari Collective</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { height: 100%; }
+    body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-weight: 700; }
+
+    #bg {
+      position: fixed; inset: 0; z-index: -2;
+      background-color: #ffffff;
+      opacity: 0;
+    }
+    #hero-video {
+      position: fixed; inset: 0; z-index: -3; overflow: hidden;
+    }
+    #hero-video video { width: 100%; height: 100%; object-fit: cover; display: block; }
+    canvas { position: fixed; inset: 0; display: block; }
+
+    /* ── Hero zone interaction ── */
+    #hero-tooltip {
+      position: fixed; left: 0; top: 0;
+      pointer-events: none;
+      z-index: 100;
+      width: clamp(150px, 15vw, 220px);
+      padding: 10px 13px;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(20px) saturate(1.4);
+      -webkit-backdrop-filter: blur(20px) saturate(1.4);
+      border: 1px solid rgba(255,255,255,0.18);
+      opacity: 0;
+      will-change: transform;
+    }
+    #hero-tooltip-label {
+      display: block;
+      font-size: 9px;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: rgba(255,255,255,0.45); font-weight: 400;
+      margin-bottom: 6px;
+    }
+    #hero-tooltip-desc {
+      font-size: 10.5px;
+      line-height: 1.6; color: rgba(255,255,255,0.82);
+      font-weight: 400; margin: 0;
+    }
+    #hero-preview {
+      position: fixed; left: 0; top: 0;
+      pointer-events: none;
+      z-index: 100;
+      width: clamp(150px, 15vw, 220px);
+      aspect-ratio: 16/9;
+      overflow: hidden;
+      opacity: 0;
+      cursor: pointer;
+      will-change: transform;
+    }
+    #hero-preview video { width:100%; height:100%; object-fit:cover; display:block; }
+    #hero-preview-label {
+      position: absolute; bottom: 8px; left: 10px;
+      font-size: clamp(9px, 0.75vw, 11px);
+      letter-spacing: 0.14em; text-transform: lowercase;
+      color: rgba(255,255,255,0.9); font-weight: 400;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+    nav { position: fixed; inset: 0; pointer-events: none; z-index: 10; mix-blend-mode: difference; }
+    nav a {
+      position: absolute; pointer-events: all;
+      font-size: clamp(11px, 1.1vw, 14px); letter-spacing: 0.04em;
+      text-transform: lowercase; text-decoration: none; color: #fff;
+      line-height: 1; padding: clamp(20px, 3vw, 36px);
+      transition: opacity 0.2s;
+    }
+    nav a:hover, #wordmark:hover { opacity: 0.7; }
+    #nav-home {
+      position: fixed; cursor: pointer;
+      padding: 0; pointer-events: none;
+      opacity: 0;
+    }
+    .tl { top: 0; left: 0; } .tr { top: 0; right: 0; }
+    .bl { bottom: 0; left: 0; } .br { bottom: 0; right: 0; }
+
+    #wordmark {
+      position: fixed;
+      left: 0;
+      top: calc(50vh - 0.78em);
+      opacity: 0;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: clamp(80px, 18vw, 260px);
+      font-weight: bold;
+      line-height: 1;
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 5;
+      color: #ffffff;
+      mix-blend-mode: difference;
+      letter-spacing: -0.02em;
+      text-decoration: none;
+      transition: opacity 0.2s, text-shadow 0.35s ease;
+    }
+
+    .section { height: 100vh; pointer-events: none; }
+
+    /* ── Project gallery ── */
+    #gallery {
+      position: fixed; inset: 0; z-index: 4;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: clamp(28px, 5vh, 56px);
+      padding: clamp(62px, 8vh, 92px) 0 clamp(22px, 4vh, 44px);
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .gallery-row { overflow: hidden; }
+    .gallery-track {
+      display: flex;
+      gap: clamp(14px, 1.8vw, 24px);
+      width: max-content;
+      will-change: transform;
+    }
+    .card {
+      flex-shrink: 0;
+      height: clamp(150px, 27vh, 270px);
+      aspect-ratio: 16 / 9;
+      background: #181818;
+      border-radius: 0;
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                  box-shadow 0.5s ease;
+    }
+    .card:hover {
+      transform: translateY(-8px) scale(1.025);
+    }
+    .card.video { background: #141414; }
+    .card.video::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent 0px, transparent 3px,
+        rgba(255,255,255,0.018) 3px, rgba(255,255,255,0.018) 4px
+      );
+      background-size: 100% 4px;
+      opacity: 0;
+      transition: opacity 0.45s ease;
+      animation: galScanlines 2.5s linear infinite paused;
+      pointer-events: none;
+    }
+    .card.video:hover::before { opacity: 1; animation-play-state: running; }
+    @keyframes galScanlines  { to { background-position: 0 4px; } }
+    @keyframes galMarquee0   { to   { transform: translateX(-50%); } }
+    @keyframes galMarquee1   { from { transform: translateX(-50%); } to { transform: translateX(0); } }
+    .card.video::after {
+      content: '▶';
+      position: absolute; bottom: 12px; right: 14px;
+      font-size: 11px; font-family: sans-serif; font-weight: 400;
+      color: rgba(255,255,255,0.45);
+      opacity: 0;
+      transition: opacity 0.35s ease;
+      pointer-events: none;
+    }
+    .card.video:hover::after { opacity: 1; }
+
+</style>
+</head>
+<body>
+
+<div id="page-cover" style="position:fixed;inset:0;background:#000;z-index:99999;pointer-events:none;"></div>
+<div id="bg"></div>
+<div id="hero-video"><video id="hero-video-main" src="karmacompressed.mp4" autoplay muted loop playsinline></video></div>
+<div id="hero-tooltip">
+  <span id="hero-tooltip-label"></span>
+  <p id="hero-tooltip-desc"></p>
+</div>
+<div id="hero-preview">
+  <video id="hero-preview-video" muted loop playsinline preload="none"></video>
+  <span id="hero-preview-label"></span>
+</div>
+<div id="wordmark">calamari</div>
+
+<nav>
+  <a href="#" class="tl" id="nav-works">gallery</a>
+  <a href="video.html" class="tr" id="nav-video">works</a>
+  <a href="photo.html" class="bl" id="nav-about">who we are</a>
+  <a href="contact.html" class="br" id="nav-contact">talk to us</a>
+  <a href="#" id="nav-home"></a>
+</nav>
+
+<div id="gallery">
+  <div class="gallery-row">
+    <div class="gallery-track">
+      <div class="card photo"><img src="DSC00011-2.png" alt="" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="card video"><video src="karmacompressed.mp4" muted loop playsinline preload="none" style="width:100%;height:100%;object-fit:cover;display:block;"></video></div>
+      <div class="card photo"><img src="DSC003612.png" alt="" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="card video"><video src="Untitled%20design.mp4" muted loop playsinline preload="none" style="width:100%;height:100%;object-fit:cover;display:block;"></video></div>
+    </div>
+  </div>
+  <div class="gallery-row">
+    <div class="gallery-track">
+      <div class="card video"><video src="Untitled%20design.mp4" muted loop playsinline preload="none" style="width:100%;height:100%;object-fit:cover;display:block;"></video></div>
+      <div class="card photo"><img src="DSC003622.png" alt="" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="card video"><video src="karmacompressed.mp4" muted loop playsinline preload="none" style="width:100%;height:100%;object-fit:cover;display:block;"></video></div>
+      <div class="card photo"><img src="DSC00402.png" alt="" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+    </div>
+  </div>
+</div>
+
+<div class="section"></div>
+<div class="section"></div>
+<div class="section"></div>
+<div class="section"></div>
+<div class="section"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+<script>
+  /* ── Entrance cover: force top, then fade out ── */
+  history.scrollRestoration = 'manual';
+  window.scrollTo(0, 0);
+  window.addEventListener('load', function() {
+    var cover = document.getElementById('page-cover');
+    gsap.to(cover, { opacity: 0, duration: 0.5, ease: 'power2.out', delay: 0.05,
+      onComplete: function() { cover.style.display = 'none'; }
+    });
+  });
+</script>
+
+<script>
+(function () {
+
+  const SVG_W = 58.23, SVG_H = 53.45;
+  const SVG_PATH = 'M8.92,34.93c2.48.76,6.04,2.69,4.92,5.57-1.01,2.36-3.2,3.86-5.02,5.79-1.29,1.18-3.78,4.15-2.31,5.4,2.5,1.23,5.92-3.4,8.37-4.66,4.08-2.54,5.22,1.37,9.38,2.29,1.62.36,1.57.22,2.68.14.97-.08,2.16-2.64,2.79-3.5.91-1.41,2.17-.77,3.56-.12,2.43,1.14,15.38,8.22,17.51,7.56,8.1-2.53,5.35-6.56,4.08-7.62-3.74-3.14-15.13-2.15-17-6.09-1.19-2.52,2.38-5.11,2.7-7.88.4-2.49-.52-5.3.72-7.62.98-1.84,3.51-2.36,5.03-.72.57.58.97,1.3,1.31,2.08.78,1.77,1.22,3.99,2.43,5.4,1.28,1.59,3.51,1.59,5.09.5,5.75-3.93,2.55-15.79-2.4-19.08-4.22-3.01-8.94-.46-12.37-2.68-2.73-1.88-2.79-6.45-5.12-8.72-.83-.85-2.08-1.39-3.02-.57-1.79,1.93.03,5.98-.47,8.65-.41,3.59-3.18,5.36-6.51,3.48-2.26-1.29-4.11-3.21-6.11-5.02-1.24-1.12-2.62-2.17-4.27-2.51-2.01-.48-4.23.65-3.18,2.53.76,1.38,2.05,2.46,3.01,3.78,1.24,1.54,2.37,4.09,1.65,5.85-.41,1.13-1.46,1.58-2.53,1.43-1.68-.16-3.62-1.39-5.41-1.01-2.08.54-1.69,2.89-.38,4.08,1.95,1.85,4.87,2.76,6.77,4.6.39.41,1.11,1.05.77,1.58-.37.46-2.01.3-3.94.03-2.05-.27-4.18-.6-6.26-.49-2,.01-4.67,1.1-5.24,2.72-.26.64-.18,1.36.25,1.92,1.87,2.07,5.64,1.85,8.47,2.9h.05Z';
+
+  /* ── Logo texture — 18 % transparent padding on all sides ──────────────
+     The padding gives the wave deformation room to push texUv outward
+     without hitting the stretched edge pixel (CLAMP_TO_EDGE). Any texUv
+     that lands in the padding zone samples alpha=0, so no visible streaks.
+  ── */
+  const TEX_PAD = 0.18;          /* fraction of texture reserved as padding */
+  const TEX_W = 2048;
+  const TEX_H = Math.round(TEX_W * SVG_H / SVG_W);
+  const offscreen = document.createElement('canvas');
+  offscreen.width  = TEX_W;
+  offscreen.height = TEX_H;
+  const ctx2d = offscreen.getContext('2d');
+  ctx2d.save();
+  ctx2d.translate(TEX_W * TEX_PAD, TEX_H * TEX_PAD);
+  ctx2d.scale(TEX_W * (1 - 2 * TEX_PAD) / SVG_W,
+              TEX_H * (1 - 2 * TEX_PAD) / SVG_H);
+  ctx2d.fillStyle = '#000000';
+  ctx2d.fill(new Path2D(SVG_PATH));
+  ctx2d.restore();
+
+  /* ── WebGL ── */
+  const canvas = document.createElement('canvas');
+  document.body.prepend(canvas);
+  const gl = canvas.getContext('webgl', { alpha: true, premultipliedAlpha: false })
+          || canvas.getContext('experimental-webgl', { alpha: true, premultipliedAlpha: false });
+
+  if (!gl) {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('viewBox', '0 0 58.23 53.45');
+    svg.style.cssText = 'position:fixed;width:90vmin;height:90vmin;margin:auto;inset:0;';
+    svg.innerHTML = '<path fill="#1d1d1b" d="' + SVG_PATH + '"/>';
+    document.body.appendChild(svg);
+    return;
+  }
+
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+  function shader(type, src) {
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS))
+      console.error('Shader error:', gl.getShaderInfoLog(s));
+    return s;
+  }
+
+  const vert = `
+    attribute vec2 aPos;
+    attribute vec2 aUv;
+    varying   vec2 vUv;
+    void main() { vUv = aUv; gl_Position = vec4(aPos, 0.0, 1.0); }
+  `;
+
+  /*
+    Water-flow deformation:
+    uFlow (0–1) drives multi-frequency sine waves applied to texUv
+    after the logo-bounds check. Multiple overlapping waves at different
+    frequencies and phases produce an organic liquid appearance.
+    The waves are purely spatial (UV-based), so no time uniform is needed —
+    GSAP drives uFlow up then back down over the scroll range.
+  */
+  const frag = `
+    precision mediump float;
+    uniform sampler2D uTex;
+    uniform vec2  uMouse;
+    uniform float uVelocity;
+    uniform vec2  uLogoMin;
+    uniform vec2  uLogoMax;
+    uniform float uAspect;
+    uniform vec3  uLogoColor;
+    uniform float uFlow;
+    uniform float uTime;
+    varying vec2  vUv;
+
+    void main() {
+      vec2 uv = vUv;
+
+      /* Cursor displacement */
+      vec2  d    = uv - uMouse;
+      d.x       *= uAspect;
+      float dist = length(d);
+      float falloff = exp(-dist * dist / (2.0 * 0.4 * 0.4));
+      vec2 dir = (dist > 0.001) ? d / dist : vec2(0.0);
+      dir.x   /= uAspect;
+      vec2 sampleUv = uv + dir * uVelocity * falloff * 0.008;
+
+      /* Logo bounds */
+      vec2 texUv = (sampleUv - uLogoMin) / (uLogoMax - uLogoMin);
+      if (texUv.x < 0.0 || texUv.x > 1.0 || texUv.y < 0.0 || texUv.y > 1.0) {
+        gl_FragColor = vec4(0.0);
+        return;
+      }
+
+      /* Water-flow: layered sine waves distort the texture UV */
+      if (uFlow > 0.001) {
+        float f = uFlow;
+        texUv.x += sin(texUv.y * 13.0 + f * 5.1) * f * 0.07
+                 + sin(texUv.y * 6.0  - f * 3.4) * f * 0.04
+                 + sin(texUv.y * 22.0 + f * 7.8) * f * 0.018;
+        texUv.y += sin(texUv.x * 9.0  + f * 4.2) * f * 0.05
+                 + sin(texUv.x * 17.0 - f * 6.1) * f * 0.022;
+      }
+
+      /* Idle breathing — very slow, always on, layers over scroll-flow */
+      texUv.x += sin(texUv.y * 3.8 + uTime * 1.05) * 0.006
+               + sin(texUv.y * 7.2 - uTime * 0.68) * 0.003;
+      texUv.y += sin(texUv.x * 3.1 + uTime * 0.82) * 0.005
+               + sin(texUv.x * 6.5 - uTime * 1.18) * 0.003;
+
+      vec4 tex = texture2D(uTex, texUv);
+      float a = smoothstep(0.15, 0.75, tex.a);
+      gl_FragColor = vec4(uLogoColor, a);
+    }
+  `;
+
+  const prog = gl.createProgram();
+  gl.attachShader(prog, shader(gl.VERTEX_SHADER,   vert));
+  gl.attachShader(prog, shader(gl.FRAGMENT_SHADER, frag));
+  gl.linkProgram(prog);
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS))
+    console.error('Program link error:', gl.getProgramInfoLog(prog));
+  gl.useProgram(prog);
+
+  const buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+    -1,-1, 0,0,   1,-1, 1,0,   -1,1, 0,1,
+     1,-1, 1,0,   1, 1, 1,1,   -1,1, 0,1
+  ]), gl.STATIC_DRAW);
+  const aPos = gl.getAttribLocation(prog, 'aPos');
+  const aUv  = gl.getAttribLocation(prog, 'aUv');
+  gl.enableVertexAttribArray(aPos);
+  gl.enableVertexAttribArray(aUv);
+  gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 16, 0);
+  gl.vertexAttribPointer(aUv,  2, gl.FLOAT, false, 16, 8);
+
+  const uTex_loc     = gl.getUniformLocation(prog, 'uTex');
+  const uMouse_loc   = gl.getUniformLocation(prog, 'uMouse');
+  const uVel_loc     = gl.getUniformLocation(prog, 'uVelocity');
+  const uLogoMin_loc = gl.getUniformLocation(prog, 'uLogoMin');
+  const uLogoMax_loc = gl.getUniformLocation(prog, 'uLogoMax');
+  const uAspect_loc  = gl.getUniformLocation(prog, 'uAspect');
+  const uColor_loc   = gl.getUniformLocation(prog, 'uLogoColor');
+  const uFlow_loc    = gl.getUniformLocation(prog, 'uFlow');
+  const uTime_loc    = gl.getUniformLocation(prog, 'uTime');
+
+  const tex = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, tex);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, offscreen);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.uniform1i(uTex_loc, 0);
+
+  /* ── Animation state ── */
+  var state = {
+    logoProgress: -1,
+    flow: 0.0,
+    inkR: 1.0, inkG: 1.0, inkB: 1.0
+  };
+
+  /* ── Logo bounds ── */
+  var introLW, introLH, introPX, introPY;
+  var initLW,  initLH,  initPX,  initPY;
+  var finLW,   finLH,   finPX,   finPY;
+
+  function resize() {
+    var w = innerWidth, h = innerHeight;
+    canvas.width  = w * devicePixelRatio;
+    canvas.height = h * devicePixelRatio;
+    canvas.style.width  = w + 'px';
+    canvas.style.height = h + 'px';
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.uniform1f(uAspect_loc, w / h);
+
+    /* Scale logo to fill the screen — slightly overscale so it feels massive */
+    var scaleToFit = Math.min(w / SVG_W, h / SVG_H) * 1.3;
+
+    /* Intro state: small logo at bottom center */
+    introLW = SVG_W * scaleToFit * 0.12;
+    introLH = SVG_H * scaleToFit * 0.12;
+    introPX = (w - introLW) * 0.5;
+    introPY = h - introLH - 60;
+    window._introLogoRect = { x: introPX, y: introPY, w: introLW, h: introLH };
+
+    initLW = SVG_W * scaleToFit;
+    initLH = SVG_H * scaleToFit;
+    initPX = (w - initLW) * 0.5;
+    initPY = (h - initLH) * 0.5;
+
+    finLW  = initLW * 0.09;
+    finLH  = initLH * 0.09;
+    finPX  = (w - finLW) * 0.5;
+    finPY  = 18;
+
+    var nh = document.getElementById('nav-home');
+    nh.style.left   = finPX + 'px';
+    nh.style.top    = finPY + 'px';
+    nh.style.width  = finLW + 'px';
+    nh.style.height = finLH + 'px';
+  }
+  resize();
+  addEventListener('resize', resize);
+
+  /* ── Mouse tracking ── */
+  var rawX = 0.5, rawY = 0.5;
+  var lerpX = 0.5, lerpY = 0.5;
+  addEventListener('mousemove', function (e) {
+    rawX = e.clientX / innerWidth;
+    rawY = 1 - e.clientY / innerHeight;
+  });
+
+  /* ── Render loop ── */
+  gl.clearColor(0, 0, 0, 0);
+
+  (function loop() {
+    requestAnimationFrame(loop);
+
+    lerpX += (rawX - lerpX) * 0.04;
+    lerpY += (rawY - lerpY) * 0.04;
+    var dx  = rawX - lerpX;
+    var dy  = rawY - lerpY;
+    var vel = Math.min(Math.sqrt(dx * dx + dy * dy) * 14, 1.0);
+
+    gl.uniform2f(uMouse_loc, lerpX, lerpY);
+    gl.uniform1f(uVel_loc,   vel);
+    gl.uniform3f(uColor_loc, state.inkR, state.inkG, state.inkB);
+    gl.uniform1f(uFlow_loc,  state.flow);
+    gl.uniform1f(uTime_loc,  performance.now() / 1000.0);
+
+    var p  = state.logoProgress;
+    var w  = innerWidth, h = innerHeight;
+    var lw, lh, px, py;
+    if (p <= 0) {
+      var t = p + 1; /* [-1,0] → [0,1]: intro bottom-small → center-large */
+      lw = introLW + (initLW - introLW) * t;
+      lh = introLH + (initLH - introLH) * t;
+      px = introPX + (initPX - introPX) * t;
+      py = introPY + (initPY - introPY) * t;
+    } else {
+      lw = initLW + (finLW - initLW) * p;
+      lh = initLH + (finLH - initLH) * p;
+      px = initPX + (finPX - initPX) * p;
+      py = initPY + (finPY - initPY) * p;
+    }
+
+    gl.uniform2f(uLogoMin_loc,  px / w,        1 - (py + lh) / h);
+    gl.uniform2f(uLogoMax_loc, (px + lw) / w,  1 - py / h);
+
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+    /* expose current logo center for transition animation */
+    window._logoRect = { cx: (px + lw * 0.5) / w, cy: (py + lh * 0.5) / h };
+  })();
+
+  /* ── Smooth scroll helper ── */
+  function smoothScroll(to, dur) {
+    var from = window.scrollY;
+    var t0 = performance.now();
+    (function step(now) {
+      var p    = Math.min((now - t0) / dur, 1);
+      var ease = 1 - Math.pow(1 - p, 3);
+      window.scrollTo(0, from + (to - from) * ease);
+      if (p < 1) requestAnimationFrame(step);
+    })(t0);
+  }
+
+  /* ── Scroll animation ── */
+  if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+    gsap.registerPlugin(ScrollTrigger);
+
+    var sections = document.querySelectorAll('.section');
+
+    /* ── State 0→1: hero video → main logo (sections[0], 0vh→100vh) ─── */
+    var tl0 = gsap.timeline({
+      scrollTrigger: {
+        trigger: sections[0],
+        start: 'top top',
+        end:   'bottom top',
+        scrub: 0.5
+      }
+    });
+    tl0.to(state, { logoProgress: 0, ease: 'power2.inOut', duration: 1 }, 0);
+    tl0.to(state, { flow: 1.0, ease: 'power2.in',  duration: 0.5 }, 0)
+       .to(state, { flow: 0.0, ease: 'power2.out', duration: 0.5 }, 0.5);
+    tl0.to(state, { inkR: 0, inkG: 0, inkB: 0, ease: 'power1.inOut', duration: 1 }, 0);
+    tl0.to('#bg',         { opacity: 1, ease: 'power1.inOut', duration: 1 }, 0);
+    tl0.to('#wordmark',   { opacity: 1, ease: 'power1.inOut', duration: 0.5 }, 0.5);
+    tl0.to('#hero-video', { opacity: 0, ease: 'power1.inOut', duration: 1 }, 0);
+
+    /* ── State 2: scroll 100vh → 300vh ───────────────────────────────── */
+    var tl2 = gsap.timeline({
+      scrollTrigger: {
+        trigger:    sections[1],
+        endTrigger: sections[2],
+        start: 'top top',
+        end:   'bottom top',
+        scrub: 0.3,
+        onUpdate: function(self) {
+          var nh = document.getElementById('nav-home');
+          var logoAtTop = self.progress > 0.85;
+          nh.style.pointerEvents = logoAtTop ? 'all' : 'none';
+          nh.style.cursor        = logoAtTop ? 'pointer' : 'default';
+        }
+      }
+    });
+
+    tl2.to(state, { logoProgress: 1, ease: 'power2.inOut', duration: 1 }, 0);
+    tl2.to(state, { flow: 1.0, ease: 'power2.in',  duration: 0.5 }, 0)
+       .to(state, { flow: 0.0, ease: 'power2.out', duration: 0.5 }, 0.5);
+
+    /* ── State 3: scroll 200vh → 300vh ─────────────────────────────────── */
+    var wm        = document.getElementById('wordmark');
+    var nwCS      = getComputedStyle(document.getElementById('nav-works'));
+    var tgtFontPx = parseFloat(nwCS.fontSize);
+    var tgtPadPx  = parseFloat(nwCS.paddingTop);
+
+    var tl3 = gsap.timeline({
+      scrollTrigger: {
+        trigger: sections[2],
+        start: 'top top',
+        end:   'bottom top',
+        scrub: 1,
+        onLeaveBack: function() {
+          document.getElementById('nav-works').style.opacity = '';
+        },
+        onUpdate: function(self) {
+          var atNav = self.progress > 0.88;
+          wm.style.pointerEvents = atNav ? 'all' : 'none';
+          wm.style.cursor        = atNav ? 'pointer' : 'default';
+          document.getElementById('nav-works').style.pointerEvents =
+            self.progress > 0.1 ? 'none' : 'auto';
+          var nh = document.getElementById('nav-home');
+          if (self.progress > 0.2) nh.style.pointerEvents = 'none';
+        }
+      }
+    });
+
+    tl3.to('#nav-works', { opacity: 0, ease: 'power1.inOut', duration: 0.35 }, 0);
+    tl3.to('#wordmark', {
+      top:           0,
+      fontSize:      tgtFontPx,
+      letterSpacing: '0.04em',
+      paddingTop:    tgtPadPx,
+      paddingLeft:   tgtPadPx,
+      ease:          'power2.inOut',
+      duration:      1
+    }, 0);
+
+
+    /* Clear GSAP's "from" inline opacity so CSS hover works on the white page */
+    document.getElementById('nav-works').style.opacity = '';
+
+    /* ── Project gallery — auto-scrolling marquee (State 3) ── */
+    var gallery   = document.getElementById('gallery');
+    var galRows   = gallery.querySelectorAll('.gallery-row');
+    var galTracks = [];
+    var GAL_DUR   = [22, 18]; /* seconds per loop, row 0 and row 1 */
+    var GAL_ANIM  = ['galMarquee0', 'galMarquee1'];
+
+    galRows.forEach(function(row, i) {
+      var track = row.querySelector('.gallery-track');
+      galTracks.push(track);
+
+      /* duplicate cards for seamless loop */
+      Array.from(track.children).forEach(function(c) {
+        track.appendChild(c.cloneNode(true));
+      });
+
+      /* start CSS animation */
+      track.style.animation = GAL_ANIM[i] + ' ' + GAL_DUR[i] + 's linear infinite';
+
+      row.addEventListener('mouseenter', function() {
+        /* read computed translateX, freeze there, coast to a stop */
+        var x0 = new DOMMatrix(getComputedStyle(track).transform).m41;
+        track.style.animation = 'none';
+        gsap.killTweensOf(track);
+        gsap.fromTo(track,
+          { x: x0 },
+          { x: x0 + (i === 0 ? -28 : 28), duration: 0.6, ease: 'power3.out',
+            onComplete: function() { gsap.set(track, { x: gsap.getProperty(track, 'x') }); }
+          }
+        );
+      });
+
+      row.addEventListener('mouseleave', function() {
+        /* resume CSS animation from current position */
+        var x1   = gsap.getProperty(track, 'x');
+        var half = track.scrollWidth / 2;
+        /* wrap x1 into [0, -half] space depending on direction */
+        var pct  = i === 0
+          ? ((-x1 % half) + half) % half / half   /* 0→1 progress into galMarquee0 */
+          : (( x1 % half) + half) % half / half;  /* 0→1 progress into galMarquee1 */
+        var delay = -pct * GAL_DUR[i];
+        gsap.killTweensOf(track);
+        gsap.set(track, { clearProps: 'transform' });
+        track.style.animation = GAL_ANIM[i] + ' ' + GAL_DUR[i] + 's linear ' + delay + 's infinite';
+      });
+    });
+
+    /* staggered row entrance — scrubbed, starts earlier */
+    gsap.fromTo(galRows,
+      { opacity: 0, y: 28 },
+      {
+        opacity: 1, y: 0,
+        stagger: 0.08,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: sections[2],
+          start: 'bottom 65%',
+          end:   'bottom top',
+          scrub: 0.8,
+          onEnter: function() {
+            gallery.style.pointerEvents = 'auto';
+            gallery.querySelectorAll('video').forEach(function(v) { v.play(); });
+          },
+          onLeaveBack: function() {
+            gallery.style.pointerEvents = 'none';
+            gallery.querySelectorAll('video').forEach(function(v) { v.pause(); });
+          }
+        }
+      }
+    );
+  }
+
+  /* ── "gallery" button → scroll to State 3 (gallery view) ── */
+  document.getElementById('nav-works').addEventListener('click', function(e) {
+    e.preventDefault();
+    smoothScroll(4 * window.innerHeight, 2500);
+  });
+
+  /* ── Wordmark "calamari" nav → scroll back to top ── */
+  document.getElementById('wordmark').addEventListener('click', function(e) {
+    e.preventDefault();
+    smoothScroll(0, 2500);
+  });
+
+  /* ── WebGL nav logo → scroll back to top ── */
+  document.getElementById('nav-home').addEventListener('click', function(e) {
+    e.preventDefault();
+    smoothScroll(0, 2500);
+  });
+
+  /* ── "video" nav → logo flows and expands to fill screen ── */
+  document.getElementById('nav-video').addEventListener('click', function(e) {
+    e.preventDefault();
+    var dest = this.href;
+    var cvs  = document.querySelector('canvas');
+
+    gsap.set(cvs, { filter: 'brightness(0)' });
+
+    var tl = gsap.timeline({ onComplete: function() { window.location.href = dest; } });
+
+    tl.to(state, { flow: 2.5, ease: 'power1.in', duration: 1.0 }, 0);
+    tl.to('#bg', { opacity: 1, backgroundColor: '#000', duration: 0.65, ease: 'power2.in' }, 0);
+    tl.to('nav',       { opacity: 0, duration: 0.22, ease: 'power1.in' }, 0);
+    tl.to('#wordmark', { opacity: 0, duration: 0.22, ease: 'power1.in' }, 0);
+    tl.to(cvs, {
+      scale: 14,
+      transformOrigin: '50% 50%',
+      duration: 1.05,
+      ease: 'power3.in'
+    }, 0.05);
+  });
+
+  function navFadeOut(dest) {
+    var cover = document.getElementById('page-cover');
+    cover.style.display = '';
+    gsap.fromTo(cover, { opacity: 0 }, {
+      opacity: 1, duration: 0.4, ease: 'power2.in',
+      onComplete: function() { window.location.href = dest; }
+    });
+  }
+
+  document.getElementById('nav-about').addEventListener('click', function(e) {
+    e.preventDefault(); navFadeOut('photo.html');
+  });
+  document.getElementById('nav-contact').addEventListener('click', function(e) {
+    e.preventDefault(); navFadeOut('contact.html');
+  });
+
+})();
+</script>
+
+<script>
+/* ── Hero video zone interaction ── */
+(function () {
+
+  var heroData = [
+    {
+      src:   'karmacompressed.mp4',
+      label: 'agency production 001',
+      desc:  'Our first agency production. Shot over three days in an industrial space — a raw study of movement and kinetic energy.'
+    },
+    {
+      src:   'zvuk/Untitled%20design.mp4',
+      label: 'agency production 002',
+      desc:  'A self-contained world of sound and image, built entirely by Kilian Conrad. Sparse, deliberate, and entirely its own.'
+    }
+  ];
+
+  var currentHero = 0;
+  var CIRCLE_R_FRAC = 0.28;
+
+  var heroMain    = document.getElementById('hero-video-main');
+  var tooltip     = document.getElementById('hero-tooltip');
+  var tooltipLbl  = document.getElementById('hero-tooltip-label');
+  var tooltipDesc = document.getElementById('hero-tooltip-desc');
+  var preview     = document.getElementById('hero-preview');
+  var previewVid  = document.getElementById('hero-preview-video');
+  var previewLbl  = document.getElementById('hero-preview-label');
+
+  function refreshContent() {
+    var cur  = heroData[currentHero];
+    var next = heroData[1 - currentHero];
+    tooltipLbl.textContent  = cur.label;
+    tooltipDesc.textContent = cur.desc;
+    previewLbl.textContent  = next.label;
+    previewVid.src = next.src;
+  }
+
+  function getR() {
+    return Math.min(innerWidth, innerHeight) * CIRCLE_R_FRAC;
+  }
+
+  function inCircle(x, y) {
+    var dx = x - innerWidth  * 0.5;
+    var dy = y - innerHeight * 0.5;
+    return dx * dx + dy * dy < getR() * getR();
+  }
+
+  function heroActive() {
+    return window.scrollY < window.innerHeight * 0.15;
+  }
+
+  var navLinks = document.querySelectorAll('nav a:not(#nav-home)');
+  var FADE_DIST = 80;
+
+  function distToRect(x, y, r) {
+    var dx = Math.max(r.left - x, 0, x - r.right);
+    var dy = Math.max(r.top  - y, 0, y - r.bottom);
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+
+  function navProximityAlpha(x, y) {
+    var minDist = Infinity;
+    for (var i = 0; i < navLinks.length; i++) {
+      minDist = Math.min(minDist, distToRect(x, y, navLinks[i].getBoundingClientRect()));
+    }
+    var lr = window._introLogoRect;
+    if (lr) minDist = Math.min(minDist, distToRect(x, y, { left: lr.x, top: lr.y, right: lr.x + lr.w, bottom: lr.y + lr.h }));
+    return Math.min(minDist / FADE_DIST, 1);
+  }
+
+  function posEl(el, x, y) {
+    var w = el.offsetWidth  || 240;
+    var h = el.offsetHeight || 100;
+    var tx, ty;
+    if (el === preview) {
+      /* Center preview on cursor so the cursor is always inside it — clicks register */
+      tx = x - w * 0.5;
+      ty = y - h * 0.5;
+    } else {
+      /* Tooltip: offset to the right of cursor, no click needed */
+      tx = x + 22;
+      ty = y - h * 0.5;
+      if (tx + w > innerWidth - 10) tx = x - w - 22;
+    }
+    tx = Math.max(8, Math.min(tx, innerWidth  - w - 8));
+    ty = Math.max(8, Math.min(ty, innerHeight - h - 8));
+    el.style.transform = 'translate(' + tx + 'px,' + ty + 'px)';
+  }
+
+  var curZone = null;
+
+  window.addEventListener('scroll', function () {
+    var progress = Math.min(window.scrollY / (window.innerHeight * 0.2), 1);
+    if (progress >= 1) { hideAll(); return; }
+    var a = 1 - progress;
+    if (curZone === 'inner') tooltip.style.opacity = String(a);
+    else if (curZone === 'outer') {
+      preview.style.opacity = String(a);
+      preview.style.pointerEvents = a > 0.05 ? 'auto' : 'none';
+    }
+  }, { passive: true });
+
+  document.addEventListener('mousemove', function (e) {
+    var x = e.clientX, y = e.clientY;
+
+    if (!heroActive()) {
+      if (curZone !== null) hideAll();
+      return;
+    }
+
+    var alpha  = navProximityAlpha(x, y);
+    var inside = inCircle(x, y);
+    var zone   = inside ? 'inner' : 'outer';
+
+    if (zone !== curZone) {
+      curZone = zone;
+      if (inside) {
+        preview.style.opacity       = '0';
+        preview.style.pointerEvents = 'none';
+        previewVid.pause();
+      } else {
+        tooltip.style.opacity = '0';
+        previewVid.play().catch(function () {});
+      }
+    }
+
+    if (curZone === 'inner') {
+      tooltip.style.opacity = String(alpha);
+      posEl(tooltip, x, y);
+    } else {
+      preview.style.opacity       = String(alpha);
+      preview.style.pointerEvents = alpha > 0.05 ? 'auto' : 'none';
+      posEl(preview, x, y);
+    }
+  });
+
+  document.addEventListener('mouseleave', hideAll);
+
+  function hideAll() {
+    tooltip.style.opacity       = '0';
+    preview.style.opacity       = '0';
+    preview.style.pointerEvents = 'none';
+    previewVid.pause();
+    curZone = null;
+  }
+
+  preview.addEventListener('click', function () {
+    currentHero = 1 - currentHero;
+    var src = heroData[currentHero].src;
+
+    gsap.to(heroMain, {
+      opacity: 0, duration: 0.35, ease: 'power2.inOut',
+      onComplete: function () {
+        heroMain.src = src;
+        heroMain.load();
+        heroMain.play().catch(function () {});
+        gsap.to(heroMain, { opacity: 1, duration: 0.35, ease: 'power2.inOut' });
+      }
+    });
+
+    hideAll();
+    refreshContent();
+  });
+
+  refreshContent();
+
+})();
+</script>
+
+</body>
+</html>

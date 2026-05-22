@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calamari Collective — Talk To Us</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; background: #000; color: #fff; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+
+  #page-cover {
+    position: fixed; inset: 0; background: #000;
+    z-index: 9999; pointer-events: none;
+  }
+  nav {
+    position: fixed; inset: 0; pointer-events: none; z-index: 200;
+    mix-blend-mode: difference;
+  }
+  nav a {
+    position: absolute; pointer-events: all;
+    font-size: clamp(11px, 1.1vw, 14px); letter-spacing: 0.04em;
+    text-transform: lowercase; text-decoration: none; color: #fff;
+    line-height: 1; padding: clamp(20px, 3vw, 36px);
+    transition: opacity 0.2s;
+  }
+  nav a:hover { opacity: 0.45; }
+  .tl { top: 0; left: 0; } .tr { top: 0; right: 0; }
+  .bl { bottom: 0; left: 0; } .br { bottom: 0; right: 0; }
+
+  /* ── Contact form ── */
+  .contact-wrap {
+    position: fixed; inset: 0; z-index: 50;
+    display: flex; align-items: center; justify-content: center;
+  }
+  form {
+    display: flex; flex-direction: column;
+    gap: clamp(20px, 3vh, 32px);
+    width: clamp(240px, 34vw, 440px);
+  }
+  .field-row {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: clamp(16px, 2vw, 28px);
+  }
+  input, textarea {
+    width: 100%; background: transparent;
+    border: none; border-bottom: 1px solid rgba(255,255,255,0.25);
+    color: #fff; outline: none;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: clamp(12px, 1vw, 15px);
+    font-weight: 400;
+    letter-spacing: 0.03em;
+    padding: 6px 0;
+    transition: border-color 0.2s;
+  }
+  input:focus, textarea:focus { border-bottom-color: rgba(255,255,255,0.7); }
+  input::placeholder, textarea::placeholder {
+    color: rgba(255,255,255,0.3);
+    text-transform: lowercase;
+  }
+  textarea { resize: none; height: clamp(60px, 10vh, 100px); }
+  button {
+    align-self: flex-start;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.3);
+    color: rgba(255,255,255,0.7);
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: clamp(10px, 0.85vw, 12px);
+    letter-spacing: 0.14em;
+    text-transform: lowercase;
+    padding: 9px 22px;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  button:hover { border-color: rgba(255,255,255,0.7); color: #fff; }
+</style>
+</head>
+<body>
+
+<div id="page-cover"></div>
+
+<nav>
+  <a href="index.html" class="tl" id="nav-gallery">gallery</a>
+  <a href="video.html" class="tr" id="nav-video">works</a>
+  <a href="photo.html" class="bl" id="nav-about">who we are</a>
+  <a href="contact.html" class="br">talk to us</a>
+</nav>
+
+<div class="contact-wrap">
+  <form action="mailto:lnaimji@gmail.com" method="post" enctype="text/plain">
+    <div class="field-row">
+      <input type="text"  name="name"    placeholder="name">
+      <input type="email" name="email"   placeholder="email">
+    </div>
+    <textarea name="message" placeholder="message"></textarea>
+    <button type="submit">send</button>
+  </form>
+</div>
+
+<script>
+(function() {
+  var cover = document.getElementById('page-cover');
+
+  /* ── WebGL animated logo — large, white, centered ── */
+  const SVG_W = 58.23, SVG_H = 53.45;
+  const SVG_PATH = 'M8.92,34.93c2.48.76,6.04,2.69,4.92,5.57-1.01,2.36-3.2,3.86-5.02,5.79-1.29,1.18-3.78,4.15-2.31,5.4,2.5,1.23,5.92-3.4,8.37-4.66,4.08-2.54,5.22,1.37,9.38,2.29,1.62.36,1.57.22,2.68.14.97-.08,2.16-2.64,2.79-3.5.91-1.41,2.17-.77,3.56-.12,2.43,1.14,15.38,8.22,17.51,7.56,8.1-2.53,5.35-6.56,4.08-7.62-3.74-3.14-15.13-2.15-17-6.09-1.19-2.52,2.38-5.11,2.7-7.88.4-2.49-.52-5.3.72-7.62.98-1.84,3.51-2.36,5.03-.72.57.58.97,1.3,1.31,2.08.78,1.77,1.22,3.99,2.43,5.4,1.28,1.59,3.51,1.59,5.09.5,5.75-3.93,2.55-15.79-2.4-19.08-4.22-3.01-8.94-.46-12.37-2.68-2.73-1.88-2.79-6.45-5.12-8.72-.83-.85-2.08-1.39-3.02-.57-1.79,1.93.03,5.98-.47,8.65-.41,3.59-3.18,5.36-6.51,3.48-2.26-1.29-4.11-3.21-6.11-5.02-1.24-1.12-2.62-2.17-4.27-2.51-2.01-.48-4.23.65-3.18,2.53.76,1.38,2.05,2.46,3.01,3.78,1.24,1.54,2.37,4.09,1.65,5.85-.41,1.13-1.46,1.58-2.53,1.43-1.68-.16-3.62-1.39-5.41-1.01-2.08.54-1.69,2.89-.38,4.08,1.95,1.85,4.87,2.76,6.77,4.6.39.41,1.11,1.05.77,1.58-.37.46-2.01.3-3.94.03-2.05-.27-4.18-.6-6.26-.49-2,.01-4.67,1.1-5.24,2.72-.26.64-.18,1.36.25,1.92,1.87,2.07,5.64,1.85,8.47,2.9h.05Z';
+
+  const TEX_PAD = 0.18;
+  const TEX_W = 2048;
+  const TEX_H = Math.round(TEX_W * SVG_H / SVG_W);
+  const offscreen = document.createElement('canvas');
+  offscreen.width = TEX_W; offscreen.height = TEX_H;
+  const ctx2d = offscreen.getContext('2d');
+  ctx2d.save();
+  ctx2d.translate(TEX_W * TEX_PAD, TEX_H * TEX_PAD);
+  ctx2d.scale(TEX_W * (1 - 2 * TEX_PAD) / SVG_W, TEX_H * (1 - 2 * TEX_PAD) / SVG_H);
+  ctx2d.fillStyle = '#fff'; ctx2d.fill(new Path2D(SVG_PATH));
+  ctx2d.restore();
+
+  const canvas = document.createElement('canvas');
+  canvas.style.cssText = 'position:fixed;inset:0;display:block;pointer-events:none;z-index:1;';
+  document.body.prepend(canvas);
+  const gl = canvas.getContext('webgl', { alpha: true, premultipliedAlpha: false })
+          || canvas.getContext('experimental-webgl', { alpha: true, premultipliedAlpha: false });
+  if (!gl) return;
+
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+  function mkShader(type, src) {
+    var s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return s;
+  }
+
+  var vert = 'attribute vec2 aPos;attribute vec2 aUv;varying vec2 vUv;void main(){vUv=aUv;gl_Position=vec4(aPos,0.,1.);}';
+  var frag = [
+    'precision mediump float;',
+    'uniform sampler2D uTex;',
+    'uniform vec2 uMouse;',
+    'uniform float uVel;',
+    'uniform float uAspect;',
+    'uniform vec2 uLogoMin,uLogoMax;',
+    'uniform vec3 uLogoColor;',
+    'uniform float uTime;',
+    'varying vec2 vUv;',
+    'void main(){',
+    '  vec2 uv=vUv;',
+    '  vec2 d=uv-uMouse; d.x*=uAspect;',
+    '  float dist=length(d);',
+    '  vec2 dir=(dist>0.001)?d/dist:vec2(0.);dir.x/=uAspect;',
+    '  uv+=dir*uVel*exp(-dist*dist/(2.*.4*.4))*0.008;',
+    '  vec2 texUv=(uv-uLogoMin)/(uLogoMax-uLogoMin);',
+    '  if(texUv.x<0.||texUv.x>1.||texUv.y<0.||texUv.y>1.){gl_FragColor=vec4(0.);return;}',
+    '  texUv.x+=sin(texUv.y*3.8+uTime*1.05)*0.006+sin(texUv.y*7.2-uTime*0.68)*0.003;',
+    '  texUv.y+=sin(texUv.x*3.1+uTime*0.82)*0.005+sin(texUv.x*6.5-uTime*1.18)*0.003;',
+    '  vec4 t=texture2D(uTex,texUv);',
+    '  gl_FragColor=vec4(uLogoColor,smoothstep(0.15,0.75,t.a));',
+    '}'
+  ].join('');
+
+  var prog = gl.createProgram();
+  gl.attachShader(prog, mkShader(gl.VERTEX_SHADER, vert));
+  gl.attachShader(prog, mkShader(gl.FRAGMENT_SHADER, frag));
+  gl.linkProgram(prog); gl.useProgram(prog);
+
+  var buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,0,0, 1,-1,1,0, -1,1,0,1, 1,-1,1,0, 1,1,1,1, -1,1,0,1]), gl.STATIC_DRAW);
+  var aPos = gl.getAttribLocation(prog,'aPos'), aUv = gl.getAttribLocation(prog,'aUv');
+  gl.enableVertexAttribArray(aPos); gl.enableVertexAttribArray(aUv);
+  gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 16, 0);
+  gl.vertexAttribPointer(aUv,  2, gl.FLOAT, false, 16, 8);
+
+  var uMin  = gl.getUniformLocation(prog,'uLogoMin');
+  var uMax  = gl.getUniformLocation(prog,'uLogoMax');
+  var uCol  = gl.getUniformLocation(prog,'uLogoColor');
+  var uTim  = gl.getUniformLocation(prog,'uTime');
+  var uMou  = gl.getUniformLocation(prog,'uMouse');
+  var uVel  = gl.getUniformLocation(prog,'uVel');
+  var uAsp  = gl.getUniformLocation(prog,'uAspect');
+  var uTexL = gl.getUniformLocation(prog,'uTex');
+
+  var tex = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, tex);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, offscreen);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.uniform1i(uTexL, 0);
+
+  var lw, lh, px, py;
+  function resize() {
+    var w = innerWidth, h = innerHeight;
+    canvas.width = w * devicePixelRatio; canvas.height = h * devicePixelRatio;
+    canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.uniform1f(uAsp, w / h);
+    var s = Math.min(w / SVG_W, h / SVG_H) * 1.3;
+    lw = SVG_W * s; lh = SVG_H * s;
+    px = (w - lw) * 0.5; py = (h - lh) * 0.5;
+  }
+  resize(); addEventListener('resize', resize);
+
+  var rawX = 0.5, rawY = 0.5, lerpX = 0.5, lerpY = 0.5;
+  addEventListener('mousemove', function(e) {
+    rawX = e.clientX / innerWidth;
+    rawY = 1 - e.clientY / innerHeight;
+  });
+
+  gl.clearColor(0, 0, 0, 0);
+  (function loop() {
+    requestAnimationFrame(loop);
+    lerpX += (rawX - lerpX) * 0.04;
+    lerpY += (rawY - lerpY) * 0.04;
+    var dx = rawX - lerpX, dy = rawY - lerpY;
+    var vel = Math.min(Math.sqrt(dx*dx + dy*dy) * 14, 1.0);
+    var w = innerWidth, h = innerHeight;
+    gl.uniform3f(uCol, 1, 1, 1);
+    gl.uniform1f(uTim, performance.now() / 1000);
+    gl.uniform2f(uMou, lerpX, lerpY);
+    gl.uniform1f(uVel, vel);
+    gl.uniform2f(uMin, px / w, 1 - (py + lh) / h);
+    gl.uniform2f(uMax, (px + lw) / w, 1 - py / h);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
+  })();
+
+  /* ── Page transitions ── */
+  gsap.to(cover, { opacity: 0, duration: 0.5, ease: 'power2.out', delay: 0.05,
+    onComplete: function() { cover.style.display = 'none'; }
+  });
+
+  function fadeOut(dest) {
+    cover.style.display = '';
+    gsap.fromTo(cover, { opacity: 0 }, {
+      opacity: 1, duration: 0.4, ease: 'power2.in',
+      onComplete: function() { window.location.href = dest; }
+    });
+  }
+
+  document.getElementById('nav-gallery').addEventListener('click', function(e) { e.preventDefault(); fadeOut('index.html'); });
+  document.getElementById('nav-video').addEventListener('click',   function(e) { e.preventDefault(); fadeOut('video.html'); });
+  document.getElementById('nav-about').addEventListener('click',   function(e) { e.preventDefault(); fadeOut('photo.html'); });
+})();
+</script>
+
+</body>
+</html>
