@@ -14,6 +14,11 @@
     position: fixed; inset: 0; background: #000;
     z-index: 9999; pointer-events: none;
   }
+  #nav-logo-btn {
+    position: fixed; cursor: pointer; z-index: 300;
+    opacity: 1; transition: opacity 0.2s;
+  }
+  #nav-logo-btn:hover { opacity: 0.45; }
   nav {
     position: fixed; inset: 0; pointer-events: none; z-index: 200;
     mix-blend-mode: difference;
@@ -38,14 +43,14 @@
     text-align: center;
   }
   .line1 {
-    font-size: clamp(14px, 1.4vw, 20px);
+    font-size: clamp(11px, 1.0vw, 15px);
     font-weight: 400;
     letter-spacing: 0.01em;
     color: #000;
     margin-bottom: clamp(12px, 2vh, 20px);
   }
   .line2 {
-    font-size: clamp(14px, 1.4vw, 20px);
+    font-size: clamp(11px, 1.0vw, 15px);
     font-weight: 400;
     letter-spacing: 0.01em;
     color: rgba(0,0,0,0.35);
@@ -55,6 +60,7 @@
 <body>
 
 <div id="page-cover"></div>
+<div id="nav-logo-btn"></div>
 
 <nav>
   <a href="index.html" class="tl" id="nav-gallery">gallery</a>
@@ -109,9 +115,18 @@
     'uniform vec2 uLogoMin,uLogoMax;',
     'uniform vec3 uLogoColor;',
     'uniform float uTime;',
+    'uniform vec2 uMouse;',
+    'uniform float uVelocity;',
+    'uniform float uAspect;',
     'varying vec2 vUv;',
     'void main(){',
-    '  vec2 texUv=(vUv-uLogoMin)/(uLogoMax-uLogoMin);',
+    '  vec2 uv=vUv;',
+    '  vec2 d=uv-uMouse; d.x*=uAspect;',
+    '  float dist=length(d);',
+    '  float falloff=exp(-dist*dist/(2.0*0.4*0.4));',
+    '  vec2 dir=(dist>0.001)?d/dist:vec2(0.0); dir.x/=uAspect;',
+    '  vec2 sampleUv=uv+dir*uVelocity*falloff*0.008;',
+    '  vec2 texUv=(sampleUv-uLogoMin)/(uLogoMax-uLogoMin);',
     '  if(texUv.x<0.||texUv.x>1.||texUv.y<0.||texUv.y>1.){gl_FragColor=vec4(0.);return;}',
     '  texUv.x+=sin(texUv.y*3.8+uTime*1.05)*0.006+sin(texUv.y*7.2-uTime*0.68)*0.003;',
     '  texUv.y+=sin(texUv.x*3.1+uTime*0.82)*0.005+sin(texUv.x*6.5-uTime*1.18)*0.003;',
@@ -137,6 +152,9 @@
   var uCol = gl.getUniformLocation(prog,'uLogoColor');
   var uTim = gl.getUniformLocation(prog,'uTime');
   var uTex = gl.getUniformLocation(prog,'uTex');
+  var uMou = gl.getUniformLocation(prog,'uMouse');
+  var uVel = gl.getUniformLocation(prog,'uVelocity');
+  var uAsp = gl.getUniformLocation(prog,'uAspect');
 
   var tex = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, tex);
@@ -149,6 +167,7 @@
   gl.uniform1i(uTex, 0);
 
   var lw, lh, px, py;
+  var logoBtn = document.getElementById('nav-logo-btn');
   function resize() {
     var w = innerWidth, h = innerHeight;
     canvas.width = w * devicePixelRatio; canvas.height = h * devicePixelRatio;
@@ -157,17 +176,34 @@
     var s = Math.min(w / SVG_W, h / SVG_H) * 1.3;
     lw = SVG_W * s * 0.09; lh = SVG_H * s * 0.09;
     px = (w - lw) * 0.5; py = 18;
+    logoBtn.style.left   = px + 'px';
+    logoBtn.style.top    = py + 'px';
+    logoBtn.style.width  = lw + 'px';
+    logoBtn.style.height = lh + 'px';
   }
   resize(); addEventListener('resize', resize);
+
+  var rawX = 0.5, rawY = 0.5, lerpX = 0.5, lerpY = 0.5;
+  addEventListener('mousemove', function(e) {
+    rawX = e.clientX / innerWidth;
+    rawY = 1 - e.clientY / innerHeight;
+  });
 
   gl.clearColor(0, 0, 0, 0);
   (function loop() {
     requestAnimationFrame(loop);
+    lerpX += (rawX - lerpX) * 0.04;
+    lerpY += (rawY - lerpY) * 0.04;
+    var dx = rawX - lerpX, dy = rawY - lerpY;
+    var vel = Math.min(Math.sqrt(dx*dx + dy*dy) * 14, 1.0);
     var w = innerWidth, h = innerHeight;
     gl.uniform3f(uCol, 0, 0, 0);
     gl.uniform1f(uTim, performance.now() / 1000);
     gl.uniform2f(uMin, px / w, 1 - (py + lh) / h);
     gl.uniform2f(uMax, (px + lw) / w, 1 - py / h);
+    gl.uniform2f(uMou, lerpX, lerpY);
+    gl.uniform1f(uVel, vel);
+    gl.uniform1f(uAsp, w / h);
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.TRIANGLES, 0, 6);
   })();
@@ -185,7 +221,8 @@
     });
   }
 
-  document.getElementById('nav-gallery').addEventListener('click', function(e) { e.preventDefault(); fadeOut('index.html'); });
+  logoBtn.addEventListener('click', function() { fadeOut('index.html'); });
+  document.getElementById('nav-gallery').addEventListener('click', function(e) { e.preventDefault(); sessionStorage.setItem('scrollToGallery','1'); fadeOut('index.html'); });
   document.getElementById('nav-video').addEventListener('click',   function(e) { e.preventDefault(); fadeOut('video.html'); });
   document.getElementById('nav-contact').addEventListener('click', function(e) { e.preventDefault(); fadeOut('contact.html'); });
 })();

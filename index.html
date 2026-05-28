@@ -7,7 +7,7 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { height: 100%; }
-    body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-weight: 700; }
+    body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-weight: 700; overflow-x: hidden; }
 
     #bg {
       position: fixed; inset: 0; z-index: -2;
@@ -18,7 +18,7 @@
       position: fixed; inset: 0; z-index: -3; overflow: hidden;
     }
     #hero-video video { width: 100%; height: 100%; object-fit: cover; display: block; }
-    canvas { position: fixed; inset: 0; display: block; }
+    canvas { position: fixed; inset: 0; display: block; pointer-events: none; z-index: 4; }
 
     /* ── Hero zone interaction ── */
     #hero-tooltip {
@@ -105,66 +105,64 @@
 
     /* ── Project gallery ── */
     #gallery {
-      position: fixed; inset: 0; z-index: 4;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: clamp(28px, 5vh, 56px);
-      padding: clamp(62px, 8vh, 92px) 0 clamp(22px, 4vh, 44px);
-      pointer-events: none;
-      overflow: hidden;
+      background: #fff;
+      padding: 80px 48px;
+      display: grid;
+      grid-template-columns: repeat(5, 160px);
+      gap: clamp(10px, 1.2vw, 18px);
+      align-items: center;
+      justify-content: space-evenly;
     }
-    .gallery-row { overflow: hidden; }
-    .gallery-track {
-      display: flex;
-      gap: clamp(14px, 1.8vw, 24px);
-      width: max-content;
-      will-change: transform;
-    }
-    .card {
-      flex-shrink: 0;
-      height: clamp(150px, 27vh, 270px);
-      aspect-ratio: 16 / 9;
-      background: #181818;
-      border-radius: 0;
+    .tile {
       overflow: hidden;
-      position: relative;
       cursor: pointer;
-      transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-                  box-shadow 0.5s ease;
-    }
-    .card:hover {
-      transform: translateY(-8px) scale(1.025);
-    }
-    .card.video { background: #141414; }
-    .card.video::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: repeating-linear-gradient(
-        0deg,
-        transparent 0px, transparent 3px,
-        rgba(255,255,255,0.018) 3px, rgba(255,255,255,0.018) 4px
-      );
-      background-size: 100% 4px;
       opacity: 0;
-      transition: opacity 0.45s ease;
-      animation: galScanlines 2.5s linear infinite paused;
-      pointer-events: none;
+      transition: opacity 0.55s ease;
     }
-    .card.video:hover::before { opacity: 1; animation-play-state: running; }
-    @keyframes galScanlines  { to { background-position: 0 4px; } }
-    @keyframes galMarquee0   { to   { transform: translateX(-50%); } }
-    @keyframes galMarquee1   { from { transform: translateX(-50%); } to { transform: translateX(0); } }
-    .card.video::after {
-      content: '▶';
-      position: absolute; bottom: 12px; right: 14px;
-      font-size: 11px; font-family: sans-serif; font-weight: 400;
-      color: rgba(255,255,255,0.45);
-      opacity: 0;
-      transition: opacity 0.35s ease;
-      pointer-events: none;
+    .tile.in-view { opacity: 1; }
+    .tile.in-view:hover { opacity: 0.88; }
+    .tile.p { aspect-ratio: 1 / 1; }
+    .tile.l { aspect-ratio: 16 / 9; }
+    .tile img, .tile video { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    /* ── Lightbox ── */
+    #lightbox {
+      position: fixed; inset: 0; z-index: 9000;
+      background: #fff;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s ease;
     }
-    .card.video:hover::after { opacity: 1; }
+    #lightbox.open { opacity: 1; pointer-events: all; }
+    #lb-container {
+      display: flex; flex-direction: column; align-items: stretch;
+      max-width: 90vw;
+    }
+    #lb-media { display: block; max-height: 80vh; max-width: 90vw; object-fit: contain; }
+    #lb-controls {
+      display: none; flex-direction: column;
+      gap: 10px; margin-top: 14px;
+    }
+    #lb-progress-track {
+      width: 100%; height: 1px;
+      background: rgba(0,0,0,0.12); position: relative;
+    }
+    #lb-progress-fill {
+      position: absolute; left: 0; top: 0; bottom: 0;
+      width: 0%; background: #000;
+      transition: width 0.25s linear;
+    }
+    #lb-ctrl-row {
+      display: flex; justify-content: flex-end; gap: clamp(16px, 2vw, 28px);
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-weight: 300; font-size: clamp(10px, 0.85vw, 12px);
+      letter-spacing: 0.1em; text-transform: lowercase;
+      color: #000;
+    }
+    #lb-play-btn, #lb-sound-btn {
+      cursor: pointer; transition: color 0.2s; user-select: none;
+    }
+    #lb-play-btn:hover, #lb-sound-btn:hover { color: rgba(0,0,0,0.35); }
 
 </style>
 </head>
@@ -191,21 +189,14 @@
   <a href="#" id="nav-home"></a>
 </nav>
 
-<div id="gallery">
-  <div class="gallery-row">
-    <div class="gallery-track">
-      <div class="card photo"><img src="DSC00011-2.png" alt="" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
-      <div class="card video"><video src="karmacompressed.mp4" muted loop playsinline preload="none" style="width:100%;height:100%;object-fit:cover;display:block;"></video></div>
-      <div class="card photo"><img src="DSC003612.png" alt="" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
-      <div class="card video"><video src="Untitled%20design.mp4" muted loop playsinline preload="none" style="width:100%;height:100%;object-fit:cover;display:block;"></video></div>
-    </div>
-  </div>
-  <div class="gallery-row">
-    <div class="gallery-track">
-      <div class="card video"><video src="Untitled%20design.mp4" muted loop playsinline preload="none" style="width:100%;height:100%;object-fit:cover;display:block;"></video></div>
-      <div class="card photo"><img src="DSC003622.png" alt="" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
-      <div class="card video"><video src="karmacompressed.mp4" muted loop playsinline preload="none" style="width:100%;height:100%;object-fit:cover;display:block;"></video></div>
-      <div class="card photo"><img src="DSC00402.png" alt="" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+<div id="lightbox">
+  <div id="lb-container">
+    <div id="lb-controls">
+      <div id="lb-progress-track"><div id="lb-progress-fill"></div></div>
+      <div id="lb-ctrl-row">
+        <span id="lb-play-btn">pause</span>
+        <span id="lb-sound-btn">sound off</span>
+      </div>
     </div>
   </div>
 </div>
@@ -213,8 +204,38 @@
 <div class="section"></div>
 <div class="section"></div>
 <div class="section"></div>
-<div class="section"></div>
-<div class="section"></div>
+
+<div id="gallery">
+  <div class="tile l"><img src="DSC00011-2.png"  alt="" loading="lazy"></div>
+  <div class="tile l"><video src="karmacompressed.mp4" muted loop playsinline preload="none"></video></div>
+  <div class="tile p"><img src="DSC003622.png"   alt="" loading="lazy"></div>
+  <div class="tile l"><img src="DSC003612.png"   alt="" loading="lazy"></div>
+  <div class="tile l"><video src="Untitled%20design.mp4" muted loop playsinline preload="none"></video></div>
+
+  <div class="tile p"><img src="DSC00402.png"    alt="" loading="lazy"></div>
+  <div class="tile l"><img src="DSC00011-2.png"  alt="" loading="lazy"></div>
+  <div class="tile l"><img src="DSC003612.png"   alt="" loading="lazy"></div>
+  <div class="tile l"><video src="karmacompressed.mp4" muted loop playsinline preload="none"></video></div>
+  <div class="tile p"><img src="DSC003622.png"   alt="" loading="lazy"></div>
+
+  <div class="tile l"><video src="Untitled%20design.mp4" muted loop playsinline preload="none"></video></div>
+  <div class="tile p"><img src="DSC00402.png"    alt="" loading="lazy"></div>
+  <div class="tile l"><img src="DSC00011-2.png"  alt="" loading="lazy"></div>
+  <div class="tile p"><img src="DSC003622.png"   alt="" loading="lazy"></div>
+  <div class="tile l"><img src="DSC003612.png"   alt="" loading="lazy"></div>
+
+  <div class="tile l"><video src="karmacompressed.mp4" muted loop playsinline preload="none"></video></div>
+  <div class="tile l"><img src="DSC00011-2.png"  alt="" loading="lazy"></div>
+  <div class="tile p"><img src="DSC00402.png"    alt="" loading="lazy"></div>
+  <div class="tile l"><video src="Untitled%20design.mp4" muted loop playsinline preload="none"></video></div>
+  <div class="tile l"><img src="DSC003612.png"   alt="" loading="lazy"></div>
+
+  <div class="tile p"><img src="DSC003622.png"   alt="" loading="lazy"></div>
+  <div class="tile l"><img src="DSC003612.png"   alt="" loading="lazy"></div>
+  <div class="tile l"><video src="karmacompressed.mp4" muted loop playsinline preload="none"></video></div>
+  <div class="tile p"><img src="DSC00402.png"    alt="" loading="lazy"></div>
+  <div class="tile l"><img src="DSC00011-2.png"  alt="" loading="lazy"></div>
+</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
@@ -226,7 +247,15 @@
   window.addEventListener('load', function() {
     var cover = document.getElementById('page-cover');
     gsap.to(cover, { opacity: 0, duration: 0.5, ease: 'power2.out', delay: 0.05,
-      onComplete: function() { cover.style.display = 'none'; }
+      onComplete: function() {
+        cover.style.display = 'none';
+        /* If arriving from another page via the gallery button, scroll there */
+        if (sessionStorage.getItem('scrollToGallery')) {
+          sessionStorage.removeItem('scrollToGallery');
+          var g = document.getElementById('gallery');
+          if (g) window.scrollTo({ top: g.offsetTop, behavior: 'instant' });
+        }
+      }
     });
   });
 </script>
@@ -594,82 +623,14 @@
     /* Clear GSAP's "from" inline opacity so CSS hover works on the white page */
     document.getElementById('nav-works').style.opacity = '';
 
-    /* ── Project gallery — auto-scrolling marquee (State 3) ── */
-    var gallery   = document.getElementById('gallery');
-    var galRows   = gallery.querySelectorAll('.gallery-row');
-    var galTracks = [];
-    var GAL_DUR   = [22, 18]; /* seconds per loop, row 0 and row 1 */
-    var GAL_ANIM  = ['galMarquee0', 'galMarquee1'];
 
-    galRows.forEach(function(row, i) {
-      var track = row.querySelector('.gallery-track');
-      galTracks.push(track);
-
-      /* duplicate cards for seamless loop */
-      Array.from(track.children).forEach(function(c) {
-        track.appendChild(c.cloneNode(true));
-      });
-
-      /* start CSS animation */
-      track.style.animation = GAL_ANIM[i] + ' ' + GAL_DUR[i] + 's linear infinite';
-
-      row.addEventListener('mouseenter', function() {
-        /* read computed translateX, freeze there, coast to a stop */
-        var x0 = new DOMMatrix(getComputedStyle(track).transform).m41;
-        track.style.animation = 'none';
-        gsap.killTweensOf(track);
-        gsap.fromTo(track,
-          { x: x0 },
-          { x: x0 + (i === 0 ? -28 : 28), duration: 0.6, ease: 'power3.out',
-            onComplete: function() { gsap.set(track, { x: gsap.getProperty(track, 'x') }); }
-          }
-        );
-      });
-
-      row.addEventListener('mouseleave', function() {
-        /* resume CSS animation from current position */
-        var x1   = gsap.getProperty(track, 'x');
-        var half = track.scrollWidth / 2;
-        /* wrap x1 into [0, -half] space depending on direction */
-        var pct  = i === 0
-          ? ((-x1 % half) + half) % half / half   /* 0→1 progress into galMarquee0 */
-          : (( x1 % half) + half) % half / half;  /* 0→1 progress into galMarquee1 */
-        var delay = -pct * GAL_DUR[i];
-        gsap.killTweensOf(track);
-        gsap.set(track, { clearProps: 'transform' });
-        track.style.animation = GAL_ANIM[i] + ' ' + GAL_DUR[i] + 's linear ' + delay + 's infinite';
-      });
-    });
-
-    /* staggered row entrance — scrubbed, starts earlier */
-    gsap.fromTo(galRows,
-      { opacity: 0, y: 28 },
-      {
-        opacity: 1, y: 0,
-        stagger: 0.08,
-        ease: 'power2.out',
-        scrollTrigger: {
-          trigger: sections[2],
-          start: 'bottom 65%',
-          end:   'bottom top',
-          scrub: 0.8,
-          onEnter: function() {
-            gallery.style.pointerEvents = 'auto';
-            gallery.querySelectorAll('video').forEach(function(v) { v.play(); });
-          },
-          onLeaveBack: function() {
-            gallery.style.pointerEvents = 'none';
-            gallery.querySelectorAll('video').forEach(function(v) { v.pause(); });
-          }
-        }
-      }
-    );
   }
 
-  /* ── "gallery" button → scroll to State 3 (gallery view) ── */
+  /* ── "gallery" button → scroll to gallery ── */
   document.getElementById('nav-works').addEventListener('click', function(e) {
     e.preventDefault();
-    smoothScroll(4 * window.innerHeight, 2500);
+    var g = document.getElementById('gallery');
+    smoothScroll(g.offsetTop, 2500);
   });
 
   /* ── Wordmark "calamari" nav → scroll back to top ── */
@@ -890,6 +851,151 @@
   });
 
   refreshContent();
+
+})();
+</script>
+
+<script>
+/* ── Gallery: lightbox + IntersectionObserver video autoplay ── */
+(function () {
+
+  var lightbox   = document.getElementById('lightbox');
+  var lbContainer= document.getElementById('lb-container');
+  var lbControls = document.getElementById('lb-controls');
+  var lbProgress = document.getElementById('lb-progress-fill');
+  var lbPlayBtn  = document.getElementById('lb-play-btn');
+  var lbSoundBtn = document.getElementById('lb-sound-btn');
+  var lbVideo    = null;
+  var lbMediaEl  = null;
+
+  function openLightbox(tile) {
+    var img   = tile.querySelector('img');
+    var video = tile.querySelector('video');
+
+    if (lbMediaEl) { lbMediaEl.remove(); lbMediaEl = null; }
+
+    if (video) {
+      lbVideo             = document.createElement('video');
+      lbVideo.src         = video.src;
+      lbVideo.autoplay    = true;
+      lbVideo.loop        = true;
+      lbVideo.muted       = false;
+      lbVideo.style.cssText = 'display:block;max-height:80vh;max-width:90vw;object-fit:contain;';
+      lbContainer.insertBefore(lbVideo, lbControls);
+      lbMediaEl = lbVideo;
+
+      lbProgress.style.width   = '0%';
+      lbPlayBtn.textContent    = 'pause';
+      lbSoundBtn.textContent   = 'sound off';
+      lbControls.style.display = 'flex';
+
+      lbVideo.addEventListener('timeupdate', function () {
+        if (lbVideo.duration)
+          lbProgress.style.width = (lbVideo.currentTime / lbVideo.duration * 100) + '%';
+      });
+      lbVideo.addEventListener('play',  function () { lbPlayBtn.textContent = 'pause'; });
+      lbVideo.addEventListener('pause', function () { lbPlayBtn.textContent = 'play'; });
+      lbVideo.play().catch(function () {});
+    } else if (img) {
+      var el = document.createElement('img');
+      el.src = img.src; el.alt = '';
+      el.style.cssText = 'display:block;max-height:80vh;max-width:90vw;object-fit:contain;';
+      lbContainer.insertBefore(el, lbControls);
+      lbMediaEl = el;
+      lbControls.style.display = 'none';
+      lbVideo = null;
+    }
+
+    lightbox.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    lightbox.classList.remove('open');
+    document.body.style.overflow = '';
+    if (lbVideo) { lbVideo.pause(); lbVideo = null; }
+    if (lbMediaEl) { lbMediaEl.remove(); lbMediaEl = null; }
+  }
+
+  lightbox.addEventListener('click', function (e) {
+    if (!e.target.closest('#lb-container')) closeLightbox();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeLightbox();
+  });
+
+  lbPlayBtn.addEventListener('click', function () {
+    if (!lbVideo) return;
+    if (lbVideo.paused) lbVideo.play().catch(function () {});
+    else lbVideo.pause();
+  });
+  lbSoundBtn.addEventListener('click', function () {
+    if (!lbVideo) return;
+    lbVideo.muted = !lbVideo.muted;
+    lbSoundBtn.textContent = lbVideo.muted ? 'sound on' : 'sound off';
+  });
+
+  /* wire up tiles */
+  document.querySelectorAll('.tile').forEach(function (tile) {
+    tile.addEventListener('click', function () { openLightbox(tile); });
+  });
+
+  /* fade tiles in as they scroll into view — gated until past the 3×100vh animation zone */
+  var animEndY = window.innerHeight * 3;
+  var tilesUnlocked = false;
+  var tileObserver = new IntersectionObserver(function (entries) {
+    if (!tilesUnlocked) return;
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in-view');
+        tileObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.tile').forEach(function (t) { tileObserver.observe(t); });
+
+  function unlockTiles() {
+    if (tilesUnlocked || window.scrollY < animEndY) return;
+    tilesUnlocked = true;
+    /* sweep: tiles already in viewport appear instantly (no transition delay) */
+    document.querySelectorAll('.tile').forEach(function (t) {
+      if (t.classList.contains('in-view')) return;
+      var r = t.getBoundingClientRect();
+      if (r.bottom > 0 && r.top < window.innerHeight * 0.88) {
+        t.style.transition = 'none';
+        t.classList.add('in-view');
+        /* restore transition after paint so hover + future fades still work */
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () { t.style.transition = ''; });
+        });
+        tileObserver.unobserve(t);
+      }
+    });
+    window.removeEventListener('scroll', unlockTiles);
+  }
+  window.addEventListener('scroll', unlockTiles, { passive: true });
+
+  /* play/pause gallery videos when in viewport */
+  var videoObserver = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) entry.target.play().catch(function () {});
+      else entry.target.pause();
+    });
+  }, { threshold: 0.25 });
+  document.querySelectorAll('#gallery video').forEach(function (v) { videoObserver.observe(v); });
+
+  /* middle column fades out before tiles reach the fixed logo */
+  var midTiles = Array.from(document.querySelectorAll('.tile'))
+                      .filter(function (_, i) { return i % 5 === 2; });
+  function updateMidFade() {
+    midTiles.forEach(function (tile) {
+      if (!tile.classList.contains('in-view')) return;
+      var t  = tile.getBoundingClientRect().top;
+      var op = t > 300 ? 1 : t < 130 ? 0 : (t - 130) / 170;
+      tile.style.opacity = op;
+    });
+  }
+  window.addEventListener('scroll', updateMidFade, { passive: true });
 
 })();
 </script>

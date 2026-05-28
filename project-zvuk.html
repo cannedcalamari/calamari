@@ -224,7 +224,7 @@
   }
 
   document.getElementById('nav-works').addEventListener('click', function(e) {
-    e.preventDefault(); fadeOut('index.html');
+    e.preventDefault(); sessionStorage.setItem('scrollToGallery','1'); fadeOut('index.html');
   });
   document.getElementById('nav-video').addEventListener('click', function(e) {
     e.preventDefault(); fadeOut('video.html');

@@ -7,12 +7,61 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <style>
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { height: 100%; background: #000; color: #fff; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+  html, body { height: 100%; background: #000; color: #fff;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
 
   #page-cover {
     position: fixed; inset: 0; background: #000;
     z-index: 9999; pointer-events: none;
   }
+
+  /* ── Blobs ── */
+  .blob {
+    position: fixed;
+    background: #fff;
+    filter: blur(52px);
+    opacity: 0.13;
+    pointer-events: none;
+    z-index: 2;
+    border-radius: 40% 60% 55% 45% / 45% 55% 45% 55%;
+  }
+  .blob-a {
+    width: clamp(200px, 28vw, 380px);
+    height: clamp(160px, 22vw, 300px);
+    top: 28%; left: 22%;
+    animation: blobA 11s ease-in-out infinite alternate;
+  }
+  .blob-b {
+    width: clamp(160px, 22vw, 300px);
+    height: clamp(200px, 26vw, 340px);
+    top: 38%; left: 50%;
+    animation: blobB 14s ease-in-out infinite alternate;
+    border-radius: 55% 45% 40% 60% / 55% 40% 60% 45%;
+  }
+  .blob-c {
+    width: clamp(120px, 16vw, 220px);
+    height: clamp(120px, 16vw, 220px);
+    top: 50%; left: 34%;
+    animation: blobC 9s ease-in-out infinite alternate;
+    border-radius: 60% 40% 50% 50% / 40% 60% 40% 60%;
+  }
+  @keyframes blobA {
+    0%   { transform: translate(0,   0)   scale(1.00) rotate(0deg);   }
+    50%  { transform: translate(6vw, 4vh)  scale(1.12) rotate(8deg);   }
+    100% { transform: translate(-4vw, 8vh) scale(0.92) rotate(-6deg);  }
+  }
+  @keyframes blobB {
+    0%   { transform: translate(0,    0)    scale(1.00) rotate(0deg);   }
+    50%  { transform: translate(-8vw, -5vh) scale(1.08) rotate(-10deg); }
+    100% { transform: translate(4vw,  6vh)  scale(0.95) rotate(12deg);  }
+  }
+  @keyframes blobC {
+    0%   { transform: translate(0,    0)   scale(1.00) rotate(0deg);   }
+    50%  { transform: translate(5vw, -8vh) scale(1.15) rotate(15deg);  }
+    100% { transform: translate(-6vw, 3vh) scale(0.88) rotate(-12deg); }
+  }
+
+  /* ── Nav ── */
   nav {
     position: fixed; inset: 0; pointer-events: none; z-index: 200;
     mix-blend-mode: difference;
@@ -28,56 +77,112 @@
   .tl { top: 0; left: 0; } .tr { top: 0; right: 0; }
   .bl { bottom: 0; left: 0; } .br { bottom: 0; right: 0; }
 
-  /* ── Contact form ── */
-  .contact-wrap {
+  /* ── Logo hotspot ── */
+  #nav-logo-btn {
+    position: fixed; cursor: pointer; z-index: 300;
+    transition: opacity 0.2s;
+  }
+  #nav-logo-btn:hover { opacity: 0.45; }
+
+  /* ── Contact wrap ── */
+  #contact-wrap {
     position: fixed; inset: 0; z-index: 50;
     display: flex; align-items: center; justify-content: center;
+    pointer-events: none;
   }
-  form {
+
+  /* ── Narrow trigger button ── */
+  #contact-trigger {
+    pointer-events: all;
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 13px 28px;
+    font-size: clamp(10px, 0.9vw, 13px);
+    letter-spacing: 0.16em; text-transform: lowercase;
+    color: rgba(255,255,255,0.75);
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(20px) saturate(1.4);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+    border: 1px solid rgba(255,255,255,0.15);
+    cursor: pointer; user-select: none;
+    white-space: nowrap;
+    transition: color 0.2s;
+  }
+  #contact-trigger:hover { color: rgba(255,255,255,1); }
+
+  /* ── Two panels (hidden until open) ── */
+  #contact-panels {
+    display: none; opacity: 0;
+    flex-direction: row;
+    gap: clamp(12px, 1.4vw, 18px);
+    pointer-events: all;
+    overflow: hidden;
+    height: 0;
+  }
+  .c-panel {
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(20px) saturate(1.4);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+    border: 1px solid rgba(255,255,255,0.15);
+    padding: clamp(36px, 5.5vh, 64px) clamp(32px, 3.4vw, 52px);
+    width: clamp(300px, 34vw, 460px);
     display: flex; flex-direction: column;
-    gap: clamp(20px, 3vh, 32px);
-    width: clamp(240px, 34vw, 440px);
+    gap: clamp(28px, 4vh, 48px);
   }
-  .field-row {
-    display: grid; grid-template-columns: 1fr 1fr;
-    gap: clamp(16px, 2vw, 28px);
-  }
+
+  /* ── Form panel ── */
   input, textarea {
     width: 100%; background: transparent;
-    border: none; border-bottom: 1px solid rgba(255,255,255,0.25);
+    border: none; border-bottom: 1px solid rgba(255,255,255,0.22);
     color: #fff; outline: none;
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: clamp(12px, 1vw, 15px);
-    font-weight: 400;
-    letter-spacing: 0.03em;
-    padding: 6px 0;
-    transition: border-color 0.2s;
+    font-size: clamp(11px, 0.85vw, 13px);
+    font-weight: 400; letter-spacing: 0.03em;
+    padding: 5px 0; transition: border-color 0.2s;
   }
-  input:focus, textarea:focus { border-bottom-color: rgba(255,255,255,0.7); }
+  input:focus, textarea:focus { border-bottom-color: rgba(255,255,255,0.6); }
   input::placeholder, textarea::placeholder {
-    color: rgba(255,255,255,0.3);
-    text-transform: lowercase;
+    color: rgba(255,255,255,0.28); text-transform: lowercase;
   }
-  textarea { resize: none; height: clamp(60px, 10vh, 100px); }
-  button {
-    align-self: flex-start;
+  textarea { resize: none; height: clamp(48px, 7vh, 72px); }
+  .send-row { display: flex; justify-content: flex-end; }
+  button[type="submit"] {
     background: transparent;
-    border: 1px solid rgba(255,255,255,0.3);
-    color: rgba(255,255,255,0.7);
+    border: 1px solid rgba(255,255,255,0.25);
+    color: rgba(255,255,255,0.6);
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: clamp(10px, 0.85vw, 12px);
-    letter-spacing: 0.14em;
-    text-transform: lowercase;
-    padding: 9px 22px;
-    cursor: pointer;
+    font-size: clamp(9px, 0.72vw, 11px);
+    letter-spacing: 0.14em; text-transform: lowercase;
+    padding: 7px 18px; cursor: pointer;
     transition: border-color 0.2s, color 0.2s;
   }
-  button:hover { border-color: rgba(255,255,255,0.7); color: #fff; }
+  button[type="submit"]:hover { border-color: rgba(255,255,255,0.6); color: #fff; }
+
+  /* ── Info panel ── */
+  .info-section { display: flex; flex-direction: column; gap: 4px; }
+  .info-value {
+    font-size: clamp(11px, 0.88vw, 14px);
+    color: rgba(255,255,255,0.7);
+    letter-spacing: 0.02em; line-height: 1.6;
+  }
+  .info-sublabel {
+    font-size: clamp(8px, 0.65vw, 10px);
+    letter-spacing: 0.16em; text-transform: lowercase;
+    color: rgba(255,255,255,0.3);
+  }
+  .info-value a {
+    color: inherit; text-decoration: none;
+    transition: color 0.2s;
+  }
+  .info-value a:hover { color: #fff; }
 </style>
 </head>
 <body>
 
 <div id="page-cover"></div>
+<div id="nav-logo-btn"></div>
+<div class="blob blob-a"></div>
+<div class="blob blob-b"></div>
+<div class="blob blob-c"></div>
 
 <nav>
   <a href="index.html" class="tl" id="nav-gallery">gallery</a>
@@ -86,27 +191,52 @@
   <a href="contact.html" class="br">talk to us</a>
 </nav>
 
-<div class="contact-wrap">
-  <form action="mailto:lnaimji@gmail.com" method="post" enctype="text/plain">
-    <div class="field-row">
+<div id="contact-wrap">
+  <div id="contact-trigger">contact us</div>
+
+  <div id="contact-panels">
+    <!-- Left: form -->
+    <div class="c-panel">
       <input type="text"  name="name"    placeholder="name">
       <input type="email" name="email"   placeholder="email">
+      <textarea name="message" placeholder="message"></textarea>
+      <div class="send-row">
+        <button type="submit">send</button>
+      </div>
     </div>
-    <textarea name="message" placeholder="message"></textarea>
-    <button type="submit">send</button>
-  </form>
+
+    <!-- Right: info -->
+    <div class="c-panel">
+      <span class="info-value"><a href="https://instagram.com/calamari_co" target="_blank">@calamari_co</a></span>
+
+      <span class="info-value">Prague, CZ<br>London, UK</span>
+
+      <div class="info-section">
+        <span class="info-value">Lysander Naimji</span>
+        <span class="info-sublabel">co-founder &nbsp;·&nbsp; dop</span>
+        <span class="info-value"><a href="tel:+000000000">+00 000 000 0000</a></span>
+      </div>
+
+      <div class="info-section">
+        <span class="info-value">Kilian Conrad</span>
+        <span class="info-sublabel">co-founder &nbsp;·&nbsp; dov</span>
+        <span class="info-value"><a href="tel:+000000000">+00 000 000 0000</a></span>
+      </div>
+
+      <span class="info-value"><a href="mailto:canned.calamari@gmail.com">canned.calamari@gmail.com</a></span>
+    </div>
+  </div>
 </div>
 
 <script>
 (function() {
   var cover = document.getElementById('page-cover');
 
-  /* ── WebGL animated logo — large, white, centered ── */
+  /* ── WebGL animated logo — small, white, nav position ── */
   const SVG_W = 58.23, SVG_H = 53.45;
   const SVG_PATH = 'M8.92,34.93c2.48.76,6.04,2.69,4.92,5.57-1.01,2.36-3.2,3.86-5.02,5.79-1.29,1.18-3.78,4.15-2.31,5.4,2.5,1.23,5.92-3.4,8.37-4.66,4.08-2.54,5.22,1.37,9.38,2.29,1.62.36,1.57.22,2.68.14.97-.08,2.16-2.64,2.79-3.5.91-1.41,2.17-.77,3.56-.12,2.43,1.14,15.38,8.22,17.51,7.56,8.1-2.53,5.35-6.56,4.08-7.62-3.74-3.14-15.13-2.15-17-6.09-1.19-2.52,2.38-5.11,2.7-7.88.4-2.49-.52-5.3.72-7.62.98-1.84,3.51-2.36,5.03-.72.57.58.97,1.3,1.31,2.08.78,1.77,1.22,3.99,2.43,5.4,1.28,1.59,3.51,1.59,5.09.5,5.75-3.93,2.55-15.79-2.4-19.08-4.22-3.01-8.94-.46-12.37-2.68-2.73-1.88-2.79-6.45-5.12-8.72-.83-.85-2.08-1.39-3.02-.57-1.79,1.93.03,5.98-.47,8.65-.41,3.59-3.18,5.36-6.51,3.48-2.26-1.29-4.11-3.21-6.11-5.02-1.24-1.12-2.62-2.17-4.27-2.51-2.01-.48-4.23.65-3.18,2.53.76,1.38,2.05,2.46,3.01,3.78,1.24,1.54,2.37,4.09,1.65,5.85-.41,1.13-1.46,1.58-2.53,1.43-1.68-.16-3.62-1.39-5.41-1.01-2.08.54-1.69,2.89-.38,4.08,1.95,1.85,4.87,2.76,6.77,4.6.39.41,1.11,1.05.77,1.58-.37.46-2.01.3-3.94.03-2.05-.27-4.18-.6-6.26-.49-2,.01-4.67,1.1-5.24,2.72-.26.64-.18,1.36.25,1.92,1.87,2.07,5.64,1.85,8.47,2.9h.05Z';
 
-  const TEX_PAD = 0.18;
-  const TEX_W = 2048;
+  const TEX_PAD = 0.18, TEX_W = 2048;
   const TEX_H = Math.round(TEX_W * SVG_H / SVG_W);
   const offscreen = document.createElement('canvas');
   offscreen.width = TEX_W; offscreen.height = TEX_H;
@@ -130,25 +260,25 @@
   function mkShader(type, src) {
     var s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return s;
   }
-
   var vert = 'attribute vec2 aPos;attribute vec2 aUv;varying vec2 vUv;void main(){vUv=aUv;gl_Position=vec4(aPos,0.,1.);}';
   var frag = [
     'precision mediump float;',
     'uniform sampler2D uTex;',
-    'uniform vec2 uMouse;',
-    'uniform float uVel;',
-    'uniform float uAspect;',
     'uniform vec2 uLogoMin,uLogoMax;',
     'uniform vec3 uLogoColor;',
     'uniform float uTime;',
+    'uniform vec2 uMouse;',
+    'uniform float uVelocity;',
+    'uniform float uAspect;',
     'varying vec2 vUv;',
     'void main(){',
     '  vec2 uv=vUv;',
     '  vec2 d=uv-uMouse; d.x*=uAspect;',
     '  float dist=length(d);',
-    '  vec2 dir=(dist>0.001)?d/dist:vec2(0.);dir.x/=uAspect;',
-    '  uv+=dir*uVel*exp(-dist*dist/(2.*.4*.4))*0.008;',
-    '  vec2 texUv=(uv-uLogoMin)/(uLogoMax-uLogoMin);',
+    '  float falloff=exp(-dist*dist/(2.0*0.4*0.4));',
+    '  vec2 dir=(dist>0.001)?d/dist:vec2(0.0); dir.x/=uAspect;',
+    '  vec2 sampleUv=uv+dir*uVelocity*falloff*0.008;',
+    '  vec2 texUv=(sampleUv-uLogoMin)/(uLogoMax-uLogoMin);',
     '  if(texUv.x<0.||texUv.x>1.||texUv.y<0.||texUv.y>1.){gl_FragColor=vec4(0.);return;}',
     '  texUv.x+=sin(texUv.y*3.8+uTime*1.05)*0.006+sin(texUv.y*7.2-uTime*0.68)*0.003;',
     '  texUv.y+=sin(texUv.x*3.1+uTime*0.82)*0.005+sin(texUv.x*6.5-uTime*1.18)*0.003;',
@@ -169,14 +299,14 @@
   gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 16, 0);
   gl.vertexAttribPointer(aUv,  2, gl.FLOAT, false, 16, 8);
 
-  var uMin  = gl.getUniformLocation(prog,'uLogoMin');
-  var uMax  = gl.getUniformLocation(prog,'uLogoMax');
-  var uCol  = gl.getUniformLocation(prog,'uLogoColor');
-  var uTim  = gl.getUniformLocation(prog,'uTime');
-  var uMou  = gl.getUniformLocation(prog,'uMouse');
-  var uVel  = gl.getUniformLocation(prog,'uVel');
-  var uAsp  = gl.getUniformLocation(prog,'uAspect');
-  var uTexL = gl.getUniformLocation(prog,'uTex');
+  var uMin = gl.getUniformLocation(prog,'uLogoMin');
+  var uMax = gl.getUniformLocation(prog,'uLogoMax');
+  var uCol = gl.getUniformLocation(prog,'uLogoColor');
+  var uTim = gl.getUniformLocation(prog,'uTime');
+  var uMou = gl.getUniformLocation(prog,'uMouse');
+  var uVel = gl.getUniformLocation(prog,'uVelocity');
+  var uAsp = gl.getUniformLocation(prog,'uAspect');
+  gl.uniform1i(gl.getUniformLocation(prog,'uTex'), 0);
 
   var tex = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, tex);
@@ -186,18 +316,21 @@
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-  gl.uniform1i(uTexL, 0);
 
   var lw, lh, px, py;
+  var logoBtn = document.getElementById('nav-logo-btn');
   function resize() {
     var w = innerWidth, h = innerHeight;
     canvas.width = w * devicePixelRatio; canvas.height = h * devicePixelRatio;
     canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
     gl.viewport(0, 0, canvas.width, canvas.height);
-    gl.uniform1f(uAsp, w / h);
     var s = Math.min(w / SVG_W, h / SVG_H) * 1.3;
-    lw = SVG_W * s; lh = SVG_H * s;
-    px = (w - lw) * 0.5; py = (h - lh) * 0.5;
+    lw = SVG_W * s * 0.09; lh = SVG_H * s * 0.09;
+    px = (w - lw) * 0.5; py = 18;
+    logoBtn.style.left   = px + 'px';
+    logoBtn.style.top    = py + 'px';
+    logoBtn.style.width  = lw + 'px';
+    logoBtn.style.height = lh + 'px';
   }
   resize(); addEventListener('resize', resize);
 
@@ -215,15 +348,70 @@
     var dx = rawX - lerpX, dy = rawY - lerpY;
     var vel = Math.min(Math.sqrt(dx*dx + dy*dy) * 14, 1.0);
     var w = innerWidth, h = innerHeight;
-    gl.uniform3f(uCol, 1, 1, 1);
+    gl.uniform3f(uCol, 1, 1, 1); /* white logo */
     gl.uniform1f(uTim, performance.now() / 1000);
-    gl.uniform2f(uMou, lerpX, lerpY);
-    gl.uniform1f(uVel, vel);
     gl.uniform2f(uMin, px / w, 1 - (py + lh) / h);
     gl.uniform2f(uMax, (px + lw) / w, 1 - py / h);
+    gl.uniform2f(uMou, lerpX, lerpY);
+    gl.uniform1f(uVel, vel);
+    gl.uniform1f(uAsp, w / h);
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.TRIANGLES, 0, 6);
   })();
+
+  /* ── Blobs: start small, expand with panels ── */
+  var blobA = document.querySelector('.blob-a');
+  var blobB = document.querySelector('.blob-b');
+  var blobC = document.querySelector('.blob-c');
+
+  /* Measure full sizes before shrinking */
+  var fullA = { w: blobA.offsetWidth,  h: blobA.offsetHeight  };
+  var fullB = { w: blobB.offsetWidth,  h: blobB.offsetHeight  };
+  var fullC = { w: blobC.offsetWidth,  h: blobC.offsetHeight  };
+
+  /* Collapse to small so they sit tight behind the button */
+  gsap.set(blobA, { width: 80,  height: 60  });
+  gsap.set(blobB, { width: 60,  height: 80  });
+  gsap.set(blobC, { width: 50,  height: 50  });
+
+  /* ── Two-panel expand ── */
+  var trigger = document.getElementById('contact-trigger');
+  var panels  = document.getElementById('contact-panels');
+  var isOpen  = false;
+
+  /* Pre-measure natural height invisibly at load — no flash */
+  panels.style.visibility = 'hidden';
+  panels.style.position   = 'absolute';
+  panels.style.display    = 'flex';
+  panels.style.height     = 'auto';
+  void panels.offsetHeight;
+  var openH = panels.offsetHeight;
+  panels.style.display    = 'none';
+  panels.style.visibility = '';
+  panels.style.position   = '';
+  panels.style.height     = '';
+
+  trigger.addEventListener('click', function() {
+    if (isOpen) return;
+    isOpen = true;
+
+    /* Grow blobs to full size as panels open */
+    gsap.to(blobA, { width: fullA.w, height: fullA.h, duration: 0.9, ease: 'power2.out' });
+    gsap.to(blobB, { width: fullB.w, height: fullB.h, duration: 1.0, ease: 'power2.out', delay: 0.06 });
+    gsap.to(blobC, { width: fullC.w, height: fullC.h, duration: 0.8, ease: 'power2.out', delay: 0.12 });
+
+    /* Fade out trigger, then grow panels in cleanly */
+    gsap.to(trigger, { opacity: 0, duration: 0.2, ease: 'power1.in',
+      onComplete: function() {
+        trigger.style.display = 'none';
+        gsap.set(panels, { display: 'flex', height: 0, opacity: 0 });
+        gsap.to(panels, { height: openH, duration: 0.55, ease: 'power3.inOut',
+          onComplete: function() { panels.style.height = 'auto'; }
+        });
+        gsap.to(panels, { opacity: 1, duration: 0.4, delay: 0.2, ease: 'power1.out' });
+      }
+    });
+  });
 
   /* ── Page transitions ── */
   gsap.to(cover, { opacity: 0, duration: 0.5, ease: 'power2.out', delay: 0.05,
@@ -238,7 +426,8 @@
     });
   }
 
-  document.getElementById('nav-gallery').addEventListener('click', function(e) { e.preventDefault(); fadeOut('index.html'); });
+  logoBtn.addEventListener('click', function() { fadeOut('index.html'); });
+  document.getElementById('nav-gallery').addEventListener('click', function(e) { e.preventDefault(); sessionStorage.setItem('scrollToGallery','1'); fadeOut('index.html'); });
   document.getElementById('nav-video').addEventListener('click',   function(e) { e.preventDefault(); fadeOut('video.html'); });
   document.getElementById('nav-about').addEventListener('click',   function(e) { e.preventDefault(); fadeOut('photo.html'); });
 })();
