@@ -68,83 +68,74 @@
   /* ── Main content ── */
   main {
     padding-top: clamp(60px, 8.5vh, 90px);
-    padding-bottom: clamp(72px, 10vh, 110px);
+    padding-bottom: clamp(100px, 14vh, 160px);
   }
 
   /* ── Project row ── */
   .project-row {
-    display: flex; align-items: flex-start;
-    padding: clamp(16px, 2.5vh, 28px) clamp(16px, 2vw, 32px);
-    gap: clamp(24px, 4vw, 56px);
-  }
-  .project-info {
-    flex: 0 0 28%;
-    display: flex; flex-direction: column;
-    justify-content: flex-start;
-    padding-right: clamp(16px, 2vw, 32px);
-  }
-  .client-name {
-    font-size: clamp(9px, 0.8vw, 11px);
-    letter-spacing: 0.18em; text-transform: uppercase;
-    color: rgba(0,0,0,0.4);
-    margin-top: clamp(10px, 1.4vh, 16px);
-    margin-bottom: 0;
-  }
-  .project-title {
-    font-size: clamp(18px, 2.2vw, 32px);
-    font-weight: bold; letter-spacing: -0.02em; line-height: 1.05;
-    margin-bottom: clamp(10px, 1.4vh, 16px);
-    cursor: pointer; transition: opacity 0.2s;
-  }
-  .project-title:hover { opacity: 0.5; }
-  .project-info { cursor: pointer; }
-  .project-desc {
-    font-size: clamp(12px, 1vw, 14px);
-    line-height: 1.65; color: rgba(0,0,0,0.5);
-    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+    padding: clamp(56px, 9vh, 110px) 0;
+    gap: clamp(24px, 3.5vw, 52px);
   }
 
-  /* ── Horizontal scroll strip ── */
-  .project-media {
-    flex: 1; overflow: hidden;
-    display: flex; align-items: center;
-  }
-  .scroll-strip {
-    overflow-x: auto; overflow-y: hidden;
-    cursor: grab; user-select: none;
-    scrollbar-width: none; -ms-overflow-style: none;
-  }
-  .scroll-strip::-webkit-scrollbar { display: none; }
-  .scroll-strip.grabbing { cursor: grabbing; }
-  .scroll-track {
+  /* left col — title */
+  .project-left {
+    flex: 1;
     display: flex;
-    gap: clamp(10px, 1.2vw, 16px);
-    padding-right: clamp(10px, 1.2vw, 16px);
+    justify-content: center;
   }
-  .media-card {
-    flex-shrink: 0;
-    height: clamp(200px, 46vh, 520px);
-    aspect-ratio: 16/9;
+  .project-title {
+    font-size: clamp(13px, 1.5vw, 22px);
+    font-weight: bold; letter-spacing: -0.02em; line-height: 1.1;
+    text-align: center;
+  }
+
+  /* center col — single preview */
+  .project-preview {
+    flex: 0 0 clamp(260px, 42vw, 640px);
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
     background: #e8e8e8;
-    position: relative; overflow: hidden;
+    position: relative;
     cursor: pointer;
+    transition: opacity 0.2s;
   }
-  .media-card:hover { background: #ddd; }
-  /* subtle grid texture on placeholder */
-  .media-card::before {
+  .project-preview:hover { opacity: 0.85; }
+  .project-preview::before {
     content: '';
-    position: absolute; inset: 0;
+    position: absolute; inset: 0; z-index: 1; pointer-events: none;
     background-image:
       linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
       linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
     background-size: 40px 40px;
   }
+  .project-preview video,
+  .project-preview img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+    position: relative; z-index: 2;
+  }
 
-  /* ── Divider ── */
-  .divider {
-    border: none;
-    border-top: 1px solid transparent;
-    margin: 0;
+  /* right col — meta */
+  .project-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding-left: clamp(8px, 2vw, 24px);
+    gap: clamp(6px, 1vh, 10px);
+  }
+  .client-name {
+    font-size: clamp(9px, 0.8vw, 11px);
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: rgba(0,0,0,0.4);
+    display: block;
+  }
+  .project-desc {
+    font-size: clamp(10px, 0.85vw, 12px);
+    letter-spacing: 0.1em; text-transform: lowercase;
+    color: rgba(0,0,0,0.35); font-weight: 300;
   }
 </style>
 </head>
@@ -166,63 +157,66 @@
 <main>
 
   <!-- Project 1 — Karma -->
-  <div class="project-row">
-    <div class="project-info">
-      <h2 class="project-title" data-href="project.html">Karma Campaign</h2>
-      <p class="project-desc">Our first agency production — a kinetic study of movement and raw energy, shot over three days in an industrial space for Karma.</p>
-      <span class="client-name">agency production 001</span>
+  <div class="project-row" data-href="project.html">
+    <div class="project-left">
+      <h2 class="project-title">Karma Campaign</h2>
     </div>
-    <div class="project-media">
-      <div class="scroll-strip">
-        <div class="scroll-track">
-          <div class="media-card"><video src="karma/karmacompressed.mp4" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:block;"></video></div>
-          <div class="media-card"><img src="karma/DSC00011-2.png" alt="" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
-          <div class="media-card"><img src="karma/DSC003612.png" alt="" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
-          <div class="media-card"><img src="karma/DSC003622.png" alt="" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
-        </div>
-      </div>
+    <div class="project-preview">
+      <video src="karma/karmacompressed.mp4" autoplay muted loop playsinline></video>
+    </div>
+    <div class="project-right">
+      <span class="client-name">agency production 001</span>
+      <p class="project-desc">click for more</p>
     </div>
   </div>
-
-  <hr class="divider">
 
   <!-- Project 2 — Zvuk -->
-  <div class="project-row">
-    <div class="project-info">
-      <h2 class="project-title" data-href="project-zvuk.html">Zvuk</h2>
-      <p class="project-desc">Kilian Conrad's solo production — a quiet, charged study of sound made visible. Every frame built to resonate.</p>
-      <span class="client-name">agency production 002</span>
+  <div class="project-row" data-href="project-zvuk.html">
+    <div class="project-left">
+      <h2 class="project-title">Zvuk</h2>
     </div>
-    <div class="project-media">
-      <div class="scroll-strip">
-        <div class="scroll-track">
-          <div class="media-card"><video src="zvuk/Untitled%20design.mp4" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:block;"></video></div>
-          <div class="media-card"><img src="zvuk/ZVUK3-102.jpg" alt="" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
-          <div class="media-card"><img src="zvuk/ZVUK3-111.jpg" alt="" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
-          <div class="media-card"><img src="zvuk/ZVUK3-115.jpg" alt="" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
-        </div>
-      </div>
+    <div class="project-preview">
+      <video src="zvuk/Untitled%20design.mp4" autoplay muted loop playsinline></video>
+    </div>
+    <div class="project-right">
+      <span class="client-name">agency production 002</span>
+      <p class="project-desc">click for more</p>
     </div>
   </div>
 
-  <hr class="divider">
-
-  <!-- Project 3 — Coming Soon -->
+  <!-- Project 3 — Prague World Series -->
   <div class="project-row">
-    <div class="project-info">
-      <h2 class="project-title" data-href="project-coming-soon.html">Coming Soon</h2>
-      <p class="project-desc">Coming soon.</p>
-      <span class="client-name">agency production 003</span>
+    <div class="project-left">
+      <h2 class="project-title">Prague World Series, 2026</h2>
     </div>
-    <div class="project-media">
-      <div class="scroll-strip">
-        <div class="scroll-track">
-          <div class="media-card"></div>
-          <div class="media-card"></div>
-          <div class="media-card"></div>
-          <div class="media-card"></div>
-        </div>
-      </div>
+    <div class="project-preview"></div>
+    <div class="project-right">
+      <span class="client-name">agency production 003</span>
+      <p class="project-desc">&nbsp;</p>
+    </div>
+  </div>
+
+  <!-- Project 4 — Project LM -->
+  <div class="project-row">
+    <div class="project-left">
+      <h2 class="project-title">Project LM</h2>
+    </div>
+    <div class="project-preview"></div>
+    <div class="project-right">
+      <span class="client-name">agency production 004</span>
+      <p class="project-desc">&nbsp;</p>
+    </div>
+  </div>
+
+  <!-- Project 5 — Coming Soon -->
+  <div class="project-row" data-href="project-coming-soon.html">
+    <div class="project-left">
+      <h2 class="project-title">Coming Soon</h2>
+    </div>
+    <div class="project-preview"></div>
+    <div class="project-right">
+      <span class="client-name">agency production 005</span>
+      <p class="project-desc">click for more</p>
     </div>
   </div>
 
@@ -230,6 +224,39 @@
 
 <script>
 (function() {
+
+  /* ── Easy mode ── */
+  (function() {
+    if (!localStorage.getItem('easyMode')) return;
+    var s = document.createElement('style');
+    s.textContent = '#easy-nav{position:fixed;top:0;left:0;right:0;height:60px;background:#fff;z-index:9000;display:flex;align-items:center;padding:0 20px;}' +
+      '#easy-nav-logo{height:30px;width:auto;display:block;filter:brightness(0);flex-shrink:0;}' +
+      '#easy-nav-links{display:flex;gap:clamp(20px,3vw,48px);align-items:center;flex:1;justify-content:center;}' +
+      '#easy-nav-links a{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-size:clamp(11px,1.1vw,14px);letter-spacing:0.04em;text-transform:lowercase;text-decoration:none;color:#000;line-height:1;transition:opacity 0.2s;}' +
+      '#easy-nav-links a:hover{opacity:0.5;}';
+    document.head.appendChild(s);
+    var nav = document.querySelector('nav'); if (nav) nav.style.display = 'none';
+    var tb = document.getElementById('top-bar'); if (tb) tb.style.display = 'none';
+    var bar = document.createElement('div'); bar.id = 'easy-nav';
+    bar.innerHTML = '<img src="calamari-symbol-negative.svg" id="easy-nav-logo" alt="">' +
+      '<div id="easy-nav-links">' +
+      '<a href="video.html">works</a>' +
+      '<a href="photo.html">who we are</a>' +
+      '<a href="contact.html">talk to us</a>' +
+      '<a id="easy-full-site" href="#">full site</a>' +
+      '</div>';
+    document.body.insertBefore(bar, document.body.firstChild);
+    new MutationObserver(function(ms){ms.forEach(function(m){m.addedNodes.forEach(function(n){if(n.tagName==='CANVAS')n.remove();});});}).observe(document.body,{childList:true});
+    document.getElementById('easy-full-site').addEventListener('click', function(e) {
+      e.preventDefault(); localStorage.removeItem('easyMode'); window.location.href = 'index.html';
+    });
+    /* Disable video autoplay in easy mode */
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('.project-preview video').forEach(function(v) {
+        v.pause(); v.autoplay = false; v.load();
+      });
+    });
+  })();
 
   /* ── Entrance ── */
   var cover = document.getElementById('page-cover');
@@ -259,36 +286,12 @@
     e.preventDefault(); fadeOut('contact.html');
   });
 
-  /* ── Project info + media card clicks ── */
+  /* ── Preview clicks only ── */
   document.querySelectorAll('.project-row').forEach(function(row) {
-    var href = row.querySelector('.project-title').dataset.href;
+    var href = row.dataset.href;
     if (!href) return;
-    row.querySelector('.project-info').addEventListener('click', function() {
+    row.querySelector('.project-preview').addEventListener('click', function() {
       fadeOut(href);
-    });
-  });
-
-  /* ── Drag-to-scroll on strips (with click-through to project) ── */
-  document.querySelectorAll('.scroll-strip').forEach(function(strip) {
-    var down = false, startX, scrollLeft, dragged = false;
-    strip.addEventListener('mousedown', function(e) {
-      down = true; dragged = false;
-      startX = e.pageX - strip.offsetLeft;
-      scrollLeft = strip.scrollLeft; strip.classList.add('grabbing');
-    });
-    window.addEventListener('mouseup', function() {
-      down = false; strip.classList.remove('grabbing');
-    });
-    strip.addEventListener('mousemove', function(e) {
-      if (!down) return; e.preventDefault();
-      var x = e.pageX - strip.offsetLeft;
-      if (Math.abs(x - startX) > 5) dragged = true;
-      strip.scrollLeft = scrollLeft - (x - startX) * 1.4;
-    });
-    strip.addEventListener('click', function() {
-      if (dragged) return;
-      var href = strip.closest('.project-row').querySelector('.project-title').dataset.href;
-      if (href) fadeOut(href);
     });
   });
 

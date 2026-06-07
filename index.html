@@ -65,6 +65,30 @@
       color: rgba(255,255,255,0.9); font-weight: 400;
       font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     }
+    #hero-action-label {
+      position: fixed; left: 0; top: 0;
+      pointer-events: none;
+      z-index: 101;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: clamp(9px, 0.75vw, 11px);
+      letter-spacing: 0.14em; text-transform: lowercase;
+      color: rgba(255,255,255,0.7); font-weight: 300;
+      opacity: 0;
+      will-change: transform;
+    }
+    #easy-mode-btn {
+      position: fixed; top: 0; left: 50%;
+      transform: translateX(-50%);
+      padding: clamp(20px, 3vw, 36px);
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: clamp(11px, 1.1vw, 14px); letter-spacing: 0.04em;
+      text-transform: lowercase; text-decoration: none; color: #fff;
+      line-height: 1; background: none; border: none; cursor: pointer;
+      z-index: 200; mix-blend-mode: difference;
+      transition: opacity 0.3s;
+      pointer-events: all;
+    }
+    #easy-mode-btn:hover { opacity: 0.7; }
     nav { position: fixed; inset: 0; pointer-events: none; z-index: 10; mix-blend-mode: difference; }
     nav a {
       position: absolute; pointer-events: all;
@@ -170,7 +194,7 @@
 
 <div id="page-cover" style="position:fixed;inset:0;background:#000;z-index:99999;pointer-events:none;"></div>
 <div id="bg"></div>
-<div id="hero-video"><video id="hero-video-main" src="karmacompressed.mp4" autoplay muted loop playsinline></video></div>
+<div id="hero-video"><video id="hero-video-main" src="karma/karmacompressed.mp4" autoplay muted loop playsinline></video></div>
 <div id="hero-tooltip">
   <span id="hero-tooltip-label"></span>
   <p id="hero-tooltip-desc"></p>
@@ -179,7 +203,10 @@
   <video id="hero-preview-video" muted loop playsinline preload="none"></video>
   <span id="hero-preview-label"></span>
 </div>
+<div id="hero-action-label"></div>
 <div id="wordmark">calamari</div>
+
+<button id="easy-mode-btn">easy mode</button>
 
 <nav>
   <a href="#" class="tl" id="nav-works">gallery</a>
@@ -206,41 +233,59 @@
 <div class="section"></div>
 
 <div id="gallery">
-  <div class="tile l"><img src="DSC00011-2.png"  alt="" loading="lazy"></div>
-  <div class="tile l"><video src="karmacompressed.mp4" muted loop playsinline preload="none"></video></div>
-  <div class="tile p"><img src="DSC003622.png"   alt="" loading="lazy"></div>
-  <div class="tile l"><img src="DSC003612.png"   alt="" loading="lazy"></div>
-  <div class="tile l"><video src="Untitled%20design.mp4" muted loop playsinline preload="none"></video></div>
+  <div class="tile l"><img src="karma/DSC00011-2.png"  alt="" loading="lazy"></div>
+  <div class="tile l"><video src="karma/karmacompressed.mp4" muted loop playsinline preload="none"></video></div>
+  <div class="tile p"><img src="karma/DSC003622.png"   alt="" loading="lazy"></div>
+  <div class="tile l"><img src="karma/DSC003612.png"   alt="" loading="lazy"></div>
+  <div class="tile l"><video src="zvuk/Untitled%20design.mp4" muted loop playsinline preload="none"></video></div>
 
-  <div class="tile p"><img src="DSC00402.png"    alt="" loading="lazy"></div>
-  <div class="tile l"><img src="DSC00011-2.png"  alt="" loading="lazy"></div>
-  <div class="tile l"><img src="DSC003612.png"   alt="" loading="lazy"></div>
-  <div class="tile l"><video src="karmacompressed.mp4" muted loop playsinline preload="none"></video></div>
-  <div class="tile p"><img src="DSC003622.png"   alt="" loading="lazy"></div>
+  <div class="tile p"><img src="karma/DSC00402.png"    alt="" loading="lazy"></div>
+  <div class="tile l"><img src="karma/DSC00011-2.png"  alt="" loading="lazy"></div>
+  <div class="tile l"><img src="karma/DSC003612.png"   alt="" loading="lazy"></div>
+  <div class="tile l"><video src="karma/karmacompressed.mp4" muted loop playsinline preload="none"></video></div>
+  <div class="tile p"><img src="karma/DSC003622.png"   alt="" loading="lazy"></div>
 
-  <div class="tile l"><video src="Untitled%20design.mp4" muted loop playsinline preload="none"></video></div>
-  <div class="tile p"><img src="DSC00402.png"    alt="" loading="lazy"></div>
-  <div class="tile l"><img src="DSC00011-2.png"  alt="" loading="lazy"></div>
-  <div class="tile p"><img src="DSC003622.png"   alt="" loading="lazy"></div>
-  <div class="tile l"><img src="DSC003612.png"   alt="" loading="lazy"></div>
+  <div class="tile l"><video src="zvuk/Untitled%20design.mp4" muted loop playsinline preload="none"></video></div>
+  <div class="tile p"><img src="karma/DSC00402.png"    alt="" loading="lazy"></div>
+  <div class="tile l"><img src="karma/DSC00011-2.png"  alt="" loading="lazy"></div>
+  <div class="tile p"><img src="karma/DSC003622.png"   alt="" loading="lazy"></div>
+  <div class="tile l"><img src="karma/DSC003612.png"   alt="" loading="lazy"></div>
 
-  <div class="tile l"><video src="karmacompressed.mp4" muted loop playsinline preload="none"></video></div>
-  <div class="tile l"><img src="DSC00011-2.png"  alt="" loading="lazy"></div>
-  <div class="tile p"><img src="DSC00402.png"    alt="" loading="lazy"></div>
-  <div class="tile l"><video src="Untitled%20design.mp4" muted loop playsinline preload="none"></video></div>
-  <div class="tile l"><img src="DSC003612.png"   alt="" loading="lazy"></div>
+  <div class="tile l"><video src="karma/karmacompressed.mp4" muted loop playsinline preload="none"></video></div>
+  <div class="tile l"><img src="karma/DSC00011-2.png"  alt="" loading="lazy"></div>
+  <div class="tile p"><img src="karma/DSC00402.png"    alt="" loading="lazy"></div>
+  <div class="tile l"><video src="zvuk/Untitled%20design.mp4" muted loop playsinline preload="none"></video></div>
+  <div class="tile l"><img src="karma/DSC003612.png"   alt="" loading="lazy"></div>
 
-  <div class="tile p"><img src="DSC003622.png"   alt="" loading="lazy"></div>
-  <div class="tile l"><img src="DSC003612.png"   alt="" loading="lazy"></div>
-  <div class="tile l"><video src="karmacompressed.mp4" muted loop playsinline preload="none"></video></div>
-  <div class="tile p"><img src="DSC00402.png"    alt="" loading="lazy"></div>
-  <div class="tile l"><img src="DSC00011-2.png"  alt="" loading="lazy"></div>
+  <div class="tile p"><img src="karma/DSC003622.png"   alt="" loading="lazy"></div>
+  <div class="tile l"><img src="karma/DSC003612.png"   alt="" loading="lazy"></div>
+  <div class="tile l"><video src="karma/karmacompressed.mp4" muted loop playsinline preload="none"></video></div>
+  <div class="tile p"><img src="karma/DSC00402.png"    alt="" loading="lazy"></div>
+  <div class="tile l"><img src="karma/DSC00011-2.png"  alt="" loading="lazy"></div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 
 <script>
+  /* ── Easy mode: redirect immediately if flag is set ── */
+  if (localStorage.getItem('easyMode')) {
+    window.location.replace('video.html');
+  }
+
+  /* ── Easy mode button scroll fade ── */
+  (function() {
+    var btn = document.getElementById('easy-mode-btn');
+    btn.addEventListener('click', function() {
+      localStorage.setItem('easyMode', '1');
+      window.location.href = 'video.html';
+    });
+    window.addEventListener('scroll', function() {
+      var progress = Math.min(window.scrollY / 80, 1);
+      btn.style.opacity = String(1 - progress);
+    }, { passive: true });
+  })();
+
   /* ── Entrance cover: force top, then fade out ── */
   history.scrollRestoration = 'manual';
   window.scrollTo(0, 0);
@@ -692,7 +737,7 @@
 
   var heroData = [
     {
-      src:   'karmacompressed.mp4',
+      src:   'karma/karmacompressed.mp4',
       label: 'agency production 001',
       desc:  'Our first agency production. Shot over three days in an industrial space — a raw study of movement and kinetic energy.'
     },
@@ -713,6 +758,7 @@
   var preview     = document.getElementById('hero-preview');
   var previewVid  = document.getElementById('hero-preview-video');
   var previewLbl  = document.getElementById('hero-preview-label');
+  var actionLabel = document.getElementById('hero-action-label');
 
   function refreshContent() {
     var cur  = heroData[currentHero];
@@ -738,6 +784,7 @@
   }
 
   var navLinks = document.querySelectorAll('nav a:not(#nav-home)');
+  var easyBtn  = document.getElementById('easy-mode-btn');
   var FADE_DIST = 80;
 
   function distToRect(x, y, r) {
@@ -751,6 +798,7 @@
     for (var i = 0; i < navLinks.length; i++) {
       minDist = Math.min(minDist, distToRect(x, y, navLinks[i].getBoundingClientRect()));
     }
+    if (easyBtn) minDist = Math.min(minDist, distToRect(x, y, easyBtn.getBoundingClientRect()));
     var lr = window._introLogoRect;
     if (lr) minDist = Math.min(minDist, distToRect(x, y, { left: lr.x, top: lr.y, right: lr.x + lr.w, bottom: lr.y + lr.h }));
     return Math.min(minDist / FADE_DIST, 1);
@@ -773,6 +821,13 @@
     tx = Math.max(8, Math.min(tx, innerWidth  - w - 8));
     ty = Math.max(8, Math.min(ty, innerHeight - h - 8));
     el.style.transform = 'translate(' + tx + 'px,' + ty + 'px)';
+    return { tx: tx, ty: ty };
+  }
+
+  function posActionLabel(coords, alpha) {
+    var lh = actionLabel.offsetHeight || 14;
+    actionLabel.style.transform = 'translate(' + coords.tx + 'px,' + (coords.ty - lh - 2) + 'px)';
+    actionLabel.style.opacity = String(alpha);
   }
 
   var curZone = null;
@@ -781,10 +836,13 @@
     var progress = Math.min(window.scrollY / (window.innerHeight * 0.2), 1);
     if (progress >= 1) { hideAll(); return; }
     var a = 1 - progress;
-    if (curZone === 'inner') tooltip.style.opacity = String(a);
-    else if (curZone === 'outer') {
+    if (curZone === 'inner') {
+      tooltip.style.opacity = String(a);
+      actionLabel.style.opacity = String(a);
+    } else if (curZone === 'outer') {
       preview.style.opacity = String(a);
       preview.style.pointerEvents = a > 0.05 ? 'auto' : 'none';
+      actionLabel.style.opacity = String(a);
     }
   }, { passive: true });
 
@@ -814,11 +872,15 @@
 
     if (curZone === 'inner') {
       tooltip.style.opacity = String(alpha);
-      posEl(tooltip, x, y);
+      var coords = posEl(tooltip, x, y);
+      actionLabel.textContent = 'project description';
+      posActionLabel(coords, alpha);
     } else {
       preview.style.opacity       = String(alpha);
       preview.style.pointerEvents = alpha > 0.05 ? 'auto' : 'none';
-      posEl(preview, x, y);
+      var coords = posEl(preview, x, y);
+      actionLabel.textContent = 'click for next project';
+      posActionLabel(coords, alpha);
     }
   });
 
@@ -828,6 +890,7 @@
     tooltip.style.opacity       = '0';
     preview.style.opacity       = '0';
     preview.style.pointerEvents = 'none';
+    actionLabel.style.opacity   = '0';
     previewVid.pause();
     curZone = null;
   }

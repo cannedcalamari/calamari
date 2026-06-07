@@ -91,24 +91,6 @@
     pointer-events: none;
   }
 
-  /* ── Narrow trigger button ── */
-  #contact-trigger {
-    pointer-events: all;
-    display: inline-flex; align-items: center; justify-content: center;
-    padding: 13px 28px;
-    font-size: clamp(10px, 0.9vw, 13px);
-    letter-spacing: 0.16em; text-transform: lowercase;
-    color: rgba(255,255,255,0.75);
-    background: rgba(255,255,255,0.08);
-    backdrop-filter: blur(20px) saturate(1.4);
-    -webkit-backdrop-filter: blur(20px) saturate(1.4);
-    border: 1px solid rgba(255,255,255,0.15);
-    cursor: pointer; user-select: none;
-    white-space: nowrap;
-    transition: color 0.2s;
-  }
-  #contact-trigger:hover { color: rgba(255,255,255,1); }
-
   /* ── Two panels (hidden until open) ── */
   #contact-panels {
     display: none; opacity: 0;
@@ -192,8 +174,6 @@
 </nav>
 
 <div id="contact-wrap">
-  <div id="contact-trigger">contact us</div>
-
   <div id="contact-panels">
     <!-- Left: form -->
     <div class="c-panel">
@@ -230,6 +210,33 @@
 
 <script>
 (function() {
+  /* ── Easy mode ── */
+  (function() {
+    if (!localStorage.getItem('easyMode')) return;
+    var s = document.createElement('style');
+    s.textContent = '#easy-nav{position:fixed;top:0;left:0;right:0;height:60px;background:#000;z-index:9000;display:flex;align-items:center;padding:0 20px;}' +
+      '#easy-nav-logo{height:30px;width:auto;display:block;filter:brightness(0) invert(1);flex-shrink:0;}' +
+      '#easy-nav-links{display:flex;gap:clamp(20px,3vw,48px);align-items:center;flex:1;justify-content:center;}' +
+      '#easy-nav-links a{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-size:clamp(11px,1.1vw,14px);letter-spacing:0.04em;text-transform:lowercase;text-decoration:none;color:#fff;line-height:1;transition:opacity 0.2s;}' +
+      '#easy-nav-links a:hover{opacity:0.5;}';
+    document.head.appendChild(s);
+    var nav = document.querySelector('nav'); if (nav) nav.style.display = 'none';
+    var lb = document.getElementById('nav-logo-btn'); if (lb) lb.style.display = 'none';
+    var bar = document.createElement('div'); bar.id = 'easy-nav';
+    bar.innerHTML = '<img src="calamari-symbol-negative.svg" id="easy-nav-logo" alt="">' +
+      '<div id="easy-nav-links">' +
+      '<a href="video.html">works</a>' +
+      '<a href="photo.html">who we are</a>' +
+      '<a href="contact.html">talk to us</a>' +
+      '<a id="easy-full-site" href="#">full site</a>' +
+      '</div>';
+    document.body.insertBefore(bar, document.body.firstChild);
+    new MutationObserver(function(ms){ms.forEach(function(m){m.addedNodes.forEach(function(n){if(n.tagName==='CANVAS')n.remove();});});}).observe(document.body,{childList:true});
+    document.getElementById('easy-full-site').addEventListener('click', function(e) {
+      e.preventDefault(); localStorage.removeItem('easyMode'); window.location.href = 'index.html';
+    });
+  })();
+
   var cover = document.getElementById('page-cover');
 
   /* ── WebGL animated logo — small, white, nav position ── */
@@ -364,22 +371,9 @@
   var blobB = document.querySelector('.blob-b');
   var blobC = document.querySelector('.blob-c');
 
-  /* Measure full sizes before shrinking */
-  var fullA = { w: blobA.offsetWidth,  h: blobA.offsetHeight  };
-  var fullB = { w: blobB.offsetWidth,  h: blobB.offsetHeight  };
-  var fullC = { w: blobC.offsetWidth,  h: blobC.offsetHeight  };
+  /* ── Panels: pre-measure then auto-open after cover ── */
+  var panels = document.getElementById('contact-panels');
 
-  /* Collapse to small so they sit tight behind the button */
-  gsap.set(blobA, { width: 80,  height: 60  });
-  gsap.set(blobB, { width: 60,  height: 80  });
-  gsap.set(blobC, { width: 50,  height: 50  });
-
-  /* ── Two-panel expand ── */
-  var trigger = document.getElementById('contact-trigger');
-  var panels  = document.getElementById('contact-panels');
-  var isOpen  = false;
-
-  /* Pre-measure natural height invisibly at load — no flash */
   panels.style.visibility = 'hidden';
   panels.style.position   = 'absolute';
   panels.style.display    = 'flex';
@@ -391,30 +385,15 @@
   panels.style.position   = '';
   panels.style.height     = '';
 
-  trigger.addEventListener('click', function() {
-    if (isOpen) return;
-    isOpen = true;
-
-    /* Grow blobs to full size as panels open */
-    gsap.to(blobA, { width: fullA.w, height: fullA.h, duration: 0.9, ease: 'power2.out' });
-    gsap.to(blobB, { width: fullB.w, height: fullB.h, duration: 1.0, ease: 'power2.out', delay: 0.06 });
-    gsap.to(blobC, { width: fullC.w, height: fullC.h, duration: 0.8, ease: 'power2.out', delay: 0.12 });
-
-    /* Fade out trigger, then grow panels in cleanly */
-    gsap.to(trigger, { opacity: 0, duration: 0.2, ease: 'power1.in',
-      onComplete: function() {
-        trigger.style.display = 'none';
-        gsap.set(panels, { display: 'flex', height: 0, opacity: 0 });
-        gsap.to(panels, { height: openH, duration: 0.55, ease: 'power3.inOut',
-          onComplete: function() { panels.style.height = 'auto'; }
-        });
-        gsap.to(panels, { opacity: 1, duration: 0.4, delay: 0.2, ease: 'power1.out' });
-      }
-    });
-  });
-
   /* ── Page transitions ── */
-  gsap.to(cover, { opacity: 0, duration: 0.5, ease: 'power2.out', delay: 0.05,
+  /* Cover fades out while panels are already opening underneath */
+  gsap.set(panels, { display: 'flex', height: 0, opacity: 0 });
+  gsap.to(panels, { height: openH, duration: 0.5, delay: 0.05, ease: 'power3.inOut',
+    onComplete: function() { panels.style.height = 'auto'; }
+  });
+  gsap.to(panels, { opacity: 1, duration: 0.35, delay: 0.15, ease: 'power1.out' });
+
+  gsap.to(cover, { opacity: 0, duration: 0.4, ease: 'power2.out', delay: 0.05,
     onComplete: function() { cover.style.display = 'none'; }
   });
 

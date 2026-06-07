@@ -57,8 +57,7 @@
     z-index: 1; pointer-events: none;
   }
   main {
-    padding: clamp(40px, 6vh, 72px) clamp(24px, 5vw, 80px)
-             clamp(100px, 14vh, 160px);
+    padding: clamp(40px, 6vh, 72px) clamp(24px, 5vw, 80px) clamp(48px, 8vh, 72px);
     max-width: 900px;
   }
   .client-name {
@@ -117,12 +116,15 @@
     color: rgba(0,0,0,0.3);
     margin-bottom: clamp(14px, 2vh, 22px);
   }
+  .strip-section {
+    padding-left: clamp(24px, 5vw, 80px);
+    padding-bottom: clamp(100px, 14vh, 160px);
+  }
   .scroll-strip {
     overflow-x: auto; overflow-y: hidden;
     cursor: grab; user-select: none;
     scrollbar-width: none; -ms-overflow-style: none;
-    margin: 0 calc(-1 * clamp(24px, 5vw, 80px));
-    padding: 0 clamp(24px, 5vw, 80px);
+    width: 100%;
   }
   .scroll-strip::-webkit-scrollbar { display: none; }
   .scroll-strip.grabbing { cursor: grabbing; }
@@ -197,6 +199,9 @@
     </p>
   </div>
 
+</main>
+
+<div class="strip-section">
   <p class="strip-label">further images</p>
   <div class="scroll-strip">
     <div class="scroll-track">
@@ -206,10 +211,35 @@
       <div class="media-card"><img src="zvuk/ZVUK3-209.jpg" alt="" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
     </div>
   </div>
-</main>
+</div>
 
 <script>
 (function() {
+  /* ── Easy mode ── */
+  (function() {
+    if (!localStorage.getItem('easyMode')) return;
+    var s = document.createElement('style');
+    s.textContent = '#easy-nav{position:fixed;top:0;left:0;right:0;height:60px;background:#fff;z-index:9000;display:flex;align-items:center;padding:0 20px;}' +
+      '#easy-nav-logo{height:30px;width:auto;display:block;filter:brightness(0);flex-shrink:0;}' +
+      '#easy-nav-links{display:flex;gap:clamp(20px,3vw,48px);align-items:center;flex:1;justify-content:center;}' +
+      '#easy-nav-links a{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-size:clamp(11px,1.1vw,14px);letter-spacing:0.04em;text-transform:lowercase;text-decoration:none;color:#000;line-height:1;transition:opacity 0.2s;}' +
+      '#easy-nav-links a:hover{opacity:0.5;}';
+    document.head.appendChild(s);
+    var nav = document.querySelector('nav'); if (nav) nav.style.display = 'none';
+    var bar = document.createElement('div'); bar.id = 'easy-nav';
+    bar.innerHTML = '<img src="calamari-symbol-negative.svg" id="easy-nav-logo" alt="">' +
+      '<div id="easy-nav-links">' +
+      '<a href="video.html">works</a>' +
+      '<a href="photo.html">who we are</a>' +
+      '<a href="contact.html">talk to us</a>' +
+      '<a id="easy-full-site" href="#">full site</a>' +
+      '</div>';
+    document.body.insertBefore(bar, document.body.firstChild);
+    document.getElementById('easy-full-site').addEventListener('click', function(e) {
+      e.preventDefault(); localStorage.removeItem('easyMode'); window.location.href = 'index.html';
+    });
+  })();
+
   var cover = document.getElementById('page-cover');
   gsap.to(cover, { opacity: 0, duration: 0.5, ease: 'power2.out', delay: 0.05,
     onComplete: function() { cover.style.display = 'none'; }
