@@ -55,6 +55,7 @@
     letter-spacing: 0.01em;
     color: rgba(0,0,0,0.35);
   }
+
 </style>
 </head>
 <body>
@@ -78,7 +79,8 @@
 (function() {
   /* ── Easy mode ── */
   (function() {
-    if (!localStorage.getItem('easyMode')) return;
+    var isMobile = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    if (!localStorage.getItem('easyMode') && !isMobile) return;
     var s = document.createElement('style');
     s.textContent = '#easy-nav{position:fixed;top:0;left:0;right:0;height:60px;background:#fff;z-index:9000;display:flex;align-items:center;padding:0 20px;}' +
       '#easy-nav-logo{height:30px;width:auto;display:block;filter:brightness(0);flex-shrink:0;}' +
@@ -89,18 +91,16 @@
     var nav = document.querySelector('nav'); if (nav) nav.style.display = 'none';
     var lb = document.getElementById('nav-logo-btn'); if (lb) lb.style.display = 'none';
     var bar = document.createElement('div'); bar.id = 'easy-nav';
-    bar.innerHTML = '<img src="calamari-symbol-negative.svg" id="easy-nav-logo" alt="">' +
-      '<div id="easy-nav-links">' +
-      '<a href="video.html">works</a>' +
-      '<a href="photo.html">who we are</a>' +
-      '<a href="contact.html">talk to us</a>' +
-      '<a id="easy-full-site" href="#">full site</a>' +
-      '</div>';
+    var links = '<a href="video.html">works</a><a href="photo.html">who we are</a><a href="contact.html">talk to us</a>';
+    if (!isMobile) { links += '<a id="easy-full-site" href="#">full site</a>'; }
+    bar.innerHTML = '<img src="calamari-symbol-negative.svg" id="easy-nav-logo" alt=""><div id="easy-nav-links">' + links + '</div>';
     document.body.insertBefore(bar, document.body.firstChild);
     new MutationObserver(function(ms){ms.forEach(function(m){m.addedNodes.forEach(function(n){if(n.tagName==='CANVAS')n.remove();});});}).observe(document.body,{childList:true});
-    document.getElementById('easy-full-site').addEventListener('click', function(e) {
-      e.preventDefault(); localStorage.removeItem('easyMode'); window.location.href = 'index.html';
-    });
+    if (!isMobile) {
+      document.getElementById('easy-full-site').addEventListener('click', function(e) {
+        e.preventDefault(); localStorage.removeItem('easyMode'); window.location.href = 'index.html';
+      });
+    }
   })();
 
   var cover = document.getElementById('page-cover');
