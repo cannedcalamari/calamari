@@ -98,7 +98,6 @@
     overflow: hidden;
     background: #e8e8e8;
     position: relative;
-    cursor: pointer;
     transition: opacity 0.2s;
   }
   .project-preview:hover { opacity: 0.85; }
@@ -136,8 +135,18 @@
     font-size: clamp(10px, 0.85vw, 12px);
     letter-spacing: 0.1em; text-transform: lowercase;
     color: rgba(0,0,0,0.35); font-weight: 300;
+    cursor: pointer;
   }
   @media (max-width: 768px) {
+    .project-desc {
+      pointer-events: all;
+      cursor: pointer;
+      padding: 10px 0;
+      font-size: 13px;
+      color: rgba(0,0,0,0.6);
+      letter-spacing: 0.08em;
+    }
+  }
     .project-row {
       flex-direction: column;
       align-items: flex-start;
@@ -322,14 +331,24 @@
     e.preventDefault(); fadeOut('contact.html');
   });
 
-  /* ── Preview clicks only ── */
+  /* ── Project-desc navigation (tap/click for more) ── */
+  var isMobileTap = window.innerWidth < 768;
   document.querySelectorAll('.project-row').forEach(function(row) {
     var href = row.dataset.href;
-    if (!href) return;
-    row.querySelector('.project-preview').addEventListener('click', function() {
-      fadeOut(href);
-    });
+    var desc = row.querySelector('.project-desc');
+    if (!desc) return;
+    desc.textContent = isMobileTap ? 'tap for more' : 'click for more';
+    if (href) {
+      desc.addEventListener('click', function() { fadeOut(href); });
+    }
   });
+
+  /* ── Force video play on first touch (mobile autoplay policy) ── */
+  document.addEventListener('touchstart', function() {
+    document.querySelectorAll('video').forEach(function(v) {
+      v.play().catch(function(){});
+    });
+  }, { once: true });
 
 })();
 </script>

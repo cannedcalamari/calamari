@@ -192,7 +192,7 @@
 </nav>
 
 <div class="hero">
-  <video src="https://res.cloudinary.com/dxi8rxodp/video/upload/v1780927050/Untitled_design_qrgjmn.mp4" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:block;"></video>
+  <video src="https://res.cloudinary.com/dxi8rxodp/video/upload/v1780927050/Untitled_design_qrgjmn.mp4" autoplay muted loop playsinline preload="metadata" style="width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;"></video>
 </div>
 
 <main>
@@ -316,6 +316,14 @@
       strip.scrollLeft = scrollLeft - (e.pageX - strip.offsetLeft - startX) * 1.4;
     });
   });
+
+  /* ── Force video play on first touch (mobile autoplay policy) ── */
+  document.addEventListener('touchstart', function() {
+    document.querySelectorAll('video').forEach(function(v) {
+      v.play().catch(function(){});
+    });
+  }, { once: true });
+
 })();
 </script>
 

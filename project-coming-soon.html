@@ -312,6 +312,14 @@
       strip.scrollLeft = scrollLeft - (e.pageX - strip.offsetLeft - startX) * 1.4;
     });
   });
+
+  /* ── Force video play on first touch (mobile autoplay policy) ── */
+  document.addEventListener('touchstart', function() {
+    document.querySelectorAll('video').forEach(function(v) {
+      v.play().catch(function(){});
+    });
+  }, { once: true });
+
 })();
 </script>
 
