@@ -148,6 +148,8 @@
     .tile.in-view:hover { opacity: 0.88; }
     .tile.p { aspect-ratio: 1 / 1; }
     .tile.l { aspect-ratio: 16 / 9; }
+    .tile.t { aspect-ratio: 3 / 4; }  /* portrait 3:4 */
+    .tile.r { aspect-ratio: 3 / 2; }  /* landscape 3:2 */
     .tile img, .tile video { width: 100%; height: 100%; object-fit: cover; display: block; }
 
     /* ── Lightbox ── */
@@ -195,7 +197,7 @@
 
 <div id="page-cover" style="position:fixed;inset:0;background:#000;z-index:99999;pointer-events:none;"></div>
 <div id="bg"></div>
-<div id="hero-video"><video id="hero-video-main" src="karma/karmacompressed.mp4" autoplay muted loop playsinline></video></div>
+<div id="hero-video"><video id="hero-video-main" src="https://res.cloudinary.com/dxi8rxodp/video/upload/v1780927141/karmacompressed_n3p6gi.mp4" autoplay muted loop playsinline></video></div>
 <div id="hero-tooltip">
   <span id="hero-tooltip-label"></span>
   <p id="hero-tooltip-desc"></p>
@@ -210,9 +212,9 @@
 <button id="easy-mode-btn">easy mode</button>
 
 <nav>
-  <a href="#" class="tl" id="nav-works">gallery</a>
-  <a href="video.html" class="tr" id="nav-video">works</a>
-  <a href="photo.html" class="bl" id="nav-about">who we are</a>
+  <a href="#" class="tl" id="nav-projects">gallery</a>
+  <a href="video.html" class="tr" id="nav-video">projects</a>
+  <a href="photo.html" class="bl" id="nav-about">about us</a>
   <a href="contact.html" class="br" id="nav-contact">talk to us</a>
   <a href="#" id="nav-home"></a>
 </nav>
@@ -234,35 +236,40 @@
 <div class="section"></div>
 
 <div id="gallery">
-  <div class="tile l"><img src="karma/DSC00011-2.png"  alt="" loading="lazy"></div>
-  <div class="tile l"><video src="karma/karmacompressed.mp4" muted loop playsinline preload="none"></video></div>
-  <div class="tile p"><img src="karma/DSC003622.png"   alt="" loading="lazy"></div>
-  <div class="tile l"><img src="karma/DSC003612.png"   alt="" loading="lazy"></div>
-  <div class="tile l"><video src="zvuk/Untitled%20design.mp4" muted loop playsinline preload="none"></video></div>
+  <!-- row 1 -->
+  <div class="tile l"><img src="https://res.cloudinary.com/dxi8rxodp/image/upload/v1780926693/DSC00011-2_ujth7e.png"  alt="" loading="lazy"></div>
+  <div class="tile l"><video src="https://res.cloudinary.com/dxi8rxodp/video/upload/v1780927141/karmacompressed_n3p6gi.mp4" muted loop playsinline preload="none"></video></div>
+  <div class="tile p"><img src="https://res.cloudinary.com/dxi8rxodp/image/upload/v1780926685/DSC003622_ypfpax.png"   alt="" loading="lazy"></div>
+  <div class="tile l"><img src="https://res.cloudinary.com/dxi8rxodp/image/upload/v1780926683/DSC003612_ertb8a.png"   alt="" loading="lazy"></div>
+  <div class="tile l"><video src="https://res.cloudinary.com/dxi8rxodp/video/upload/v1780927050/Untitled_design_qrgjmn.mp4" muted loop playsinline preload="none"></video></div>
 
-  <div class="tile p"><img src="karma/DSC00402.png"    alt="" loading="lazy"></div>
-  <div class="tile l"><img src="karma/DSC00011-2.png"  alt="" loading="lazy"></div>
-  <div class="tile l"><img src="karma/DSC003612.png"   alt="" loading="lazy"></div>
-  <div class="tile l"><video src="karma/karmacompressed.mp4" muted loop playsinline preload="none"></video></div>
-  <div class="tile p"><img src="karma/DSC003622.png"   alt="" loading="lazy"></div>
+  <!-- row 2: 1121=portrait(3:4), 848=portrait(3:4) -->
+  <div class="tile p"><img src="https://res.cloudinary.com/dxi8rxodp/image/upload/v1780926677/DSC00402_x5uzre.png"    alt="" loading="lazy"></div>
+  <div class="tile t"><img src="https://res.cloudinary.com/dxi8rxodp/image/upload/v1780926898/WorldcupPrague2026-1121_v19mli.jpg" alt="" loading="lazy"></div>
+  <div class="tile l"><img src="https://res.cloudinary.com/dxi8rxodp/image/upload/v1780926683/DSC003612_ertb8a.png"   alt="" loading="lazy"></div>
+  <div class="tile t"><img src="https://res.cloudinary.com/dxi8rxodp/image/upload/v1780926895/WorldcupPrague2026-848_jdfc5k.jpg" alt="" loading="lazy"></div>
+  <div class="tile p"><img src="https://res.cloudinary.com/dxi8rxodp/image/upload/v1780926685/DSC003622_ypfpax.png"   alt="" loading="lazy"></div>
 
-  <div class="tile l"><video src="zvuk/Untitled%20design.mp4" muted loop playsinline preload="none"></video></div>
-  <div class="tile p"><img src="karma/DSC00402.png"    alt="" loading="lazy"></div>
-  <div class="tile l"><img src="karma/DSC00011-2.png"  alt="" loading="lazy"></div>
-  <div class="tile p"><img src="karma/DSC003622.png"   alt="" loading="lazy"></div>
-  <div class="tile l"><img src="karma/DSC003612.png"   alt="" loading="lazy"></div>
+  <!-- row 3: 806=landscape(3:2), 1259=portrait(3:4) -->
+  <div class="tile r"><img src="https://res.cloudinary.com/dxi8rxodp/image/upload/v1780926890/WorldcupPrague2026-806_enonlm.jpg" alt="" loading="lazy"></div>
+  <div class="tile p"><img src="https://res.cloudinary.com/dxi8rxodp/image/upload/v1780926677/DSC00402_x5uzre.png"    alt="" loading="lazy"></div>
+  <div class="tile t"><img src="https://res.cloudinary.com/dxi8rxodp/image/upload/v1780926911/WorldcupPrague2026-1259_lltthu.jpg" alt="" loading="lazy"></div>
+  <div class="tile p"><img src="https://res.cloudinary.com/dxi8rxodp/image/upload/v1780926685/DSC003622_ypfpax.png"   alt="" loading="lazy"></div>
+  <div class="tile l"><img src="https://res.cloudinary.com/dxi8rxodp/image/upload/v1780926683/DSC003612_ertb8a.png"   alt="" loading="lazy"></div>
 
-  <div class="tile l"><video src="karma/karmacompressed.mp4" muted loop playsinline preload="none"></video></div>
-  <div class="tile l"><img src="karma/DSC00011-2.png"  alt="" loading="lazy"></div>
-  <div class="tile p"><img src="karma/DSC00402.png"    alt="" loading="lazy"></div>
-  <div class="tile l"><video src="zvuk/Untitled%20design.mp4" muted loop playsinline preload="none"></video></div>
-  <div class="tile l"><img src="karma/DSC003612.png"   alt="" loading="lazy"></div>
+  <!-- row 4: 455=landscape(3:2) -->
+  <div class="tile l"><video src="https://res.cloudinary.com/dxi8rxodp/video/upload/v1780927141/karmacompressed_n3p6gi.mp4" muted loop playsinline preload="none"></video></div>
+  <div class="tile l"><img src="https://res.cloudinary.com/dxi8rxodp/image/upload/v1780926693/DSC00011-2_ujth7e.png"  alt="" loading="lazy"></div>
+  <div class="tile r"><img src="https://res.cloudinary.com/dxi8rxodp/image/upload/v1780926903/WorldcupPrague2026-455_j1hx4d.jpg" alt="" loading="lazy"></div>
+  <div class="tile l"><video src="https://res.cloudinary.com/dxi8rxodp/video/upload/v1780927050/Untitled_design_qrgjmn.mp4" muted loop playsinline preload="none"></video></div>
+  <div class="tile l"><img src="https://res.cloudinary.com/dxi8rxodp/image/upload/v1780926683/DSC003612_ertb8a.png"   alt="" loading="lazy"></div>
 
-  <div class="tile p"><img src="karma/DSC003622.png"   alt="" loading="lazy"></div>
-  <div class="tile l"><img src="karma/DSC003612.png"   alt="" loading="lazy"></div>
-  <div class="tile l"><video src="karma/karmacompressed.mp4" muted loop playsinline preload="none"></video></div>
-  <div class="tile p"><img src="karma/DSC00402.png"    alt="" loading="lazy"></div>
-  <div class="tile l"><img src="karma/DSC00011-2.png"  alt="" loading="lazy"></div>
+  <!-- row 5: 072=portrait(3:4), 429=landscape(3:2) -->
+  <div class="tile t"><img src="https://res.cloudinary.com/dxi8rxodp/image/upload/v1780926888/WorldcupPrague2026-072_areytf.jpg" alt="" loading="lazy"></div>
+  <div class="tile l"><img src="https://res.cloudinary.com/dxi8rxodp/image/upload/v1780926683/DSC003612_ertb8a.png"   alt="" loading="lazy"></div>
+  <div class="tile r"><img src="https://res.cloudinary.com/dxi8rxodp/image/upload/v1780926909/WorldcupPrague2026-429_nmabs0.jpg" alt="" loading="lazy"></div>
+  <div class="tile p"><img src="https://res.cloudinary.com/dxi8rxodp/image/upload/v1780926677/DSC00402_x5uzre.png"    alt="" loading="lazy"></div>
+  <div class="tile l"><img src="https://res.cloudinary.com/dxi8rxodp/image/upload/v1780926693/DSC00011-2_ujth7e.png"  alt="" loading="lazy"></div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -292,16 +299,33 @@
   window.scrollTo(0, 0);
   window.addEventListener('load', function() {
     var cover = document.getElementById('page-cover');
-    gsap.to(cover, { opacity: 0, duration: 0.5, ease: 'power2.out', delay: 0.05,
-      onComplete: function() {
-        cover.style.display = 'none';
-        /* If arriving from another page via the gallery button, scroll there */
-        if (sessionStorage.getItem('scrollToGallery')) {
-          sessionStorage.removeItem('scrollToGallery');
-          var g = document.getElementById('gallery');
-          if (g) window.scrollTo({ top: g.offsetTop, behavior: 'instant' });
-        }
+    /* Scroll to gallery BEFORE the cover fades — cover stays opaque while
+       ScrollTrigger recalculates, so the logo is never visible in the wrong state.
+       The scrub lag (≤1s) resolves during the 0.5s cover fade. */
+    if (sessionStorage.getItem('scrollToGallery')) {
+      sessionStorage.removeItem('scrollToGallery');
+      var g = document.getElementById('gallery');
+      if (g) window.scrollTo({ top: g.offsetTop, behavior: 'instant' });
+      /* Snap all GSAP animations to their final state before the cover fades.
+         This prevents the scrub-smoothing lag from playing the logo animation
+         visibly as the cover fades out. */
+      if (typeof window._snapAnimationsToGallery === 'function') {
+        window._snapAnimationsToGallery();
       }
+      if (typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
+    }
+    gsap.to(cover, { opacity: 0, duration: 0.5, ease: 'power2.out', delay: 0.05,
+      onComplete: function() { cover.style.display = 'none'; }
+    });
+  });
+  /* Back-button bfcache fix: page was saved mid-fadeout (cover = black).
+     pageshow fires on bfcache restore; re-fade the cover. */
+  window.addEventListener('pageshow', function(e) {
+    if (!e.persisted) return;
+    var cover = document.getElementById('page-cover');
+    cover.style.display = ''; cover.style.opacity = '1';
+    gsap.to(cover, { opacity: 0, duration: 0.5, ease: 'power2.out', delay: 0.05,
+      onComplete: function() { cover.style.display = 'none'; }
     });
   });
 </script>
@@ -629,7 +653,7 @@
 
     /* ── State 3: scroll 200vh → 300vh ─────────────────────────────────── */
     var wm        = document.getElementById('wordmark');
-    var nwCS      = getComputedStyle(document.getElementById('nav-works'));
+    var nwCS      = getComputedStyle(document.getElementById('nav-projects'));
     var tgtFontPx = parseFloat(nwCS.fontSize);
     var tgtPadPx  = parseFloat(nwCS.paddingTop);
 
@@ -640,13 +664,13 @@
         end:   'bottom top',
         scrub: 1,
         onLeaveBack: function() {
-          document.getElementById('nav-works').style.opacity = '';
+          document.getElementById('nav-projects').style.opacity = '';
         },
         onUpdate: function(self) {
           var atNav = self.progress > 0.88;
           wm.style.pointerEvents = atNav ? 'all' : 'none';
           wm.style.cursor        = atNav ? 'pointer' : 'default';
-          document.getElementById('nav-works').style.pointerEvents =
+          document.getElementById('nav-projects').style.pointerEvents =
             self.progress > 0.1 ? 'none' : 'auto';
           var nh = document.getElementById('nav-home');
           if (self.progress > 0.2) nh.style.pointerEvents = 'none';
@@ -654,7 +678,7 @@
       }
     });
 
-    tl3.to('#nav-works', { opacity: 0, ease: 'power1.inOut', duration: 0.35 }, 0);
+    tl3.to('#nav-projects', { opacity: 0, ease: 'power1.inOut', duration: 0.35 }, 0);
     tl3.to('#wordmark', {
       top:           0,
       fontSize:      tgtFontPx,
@@ -667,13 +691,28 @@
 
 
     /* Clear GSAP's "from" inline opacity so CSS hover works on the white page */
-    document.getElementById('nav-works').style.opacity = '';
+    document.getElementById('nav-projects').style.opacity = '';
+
+    /* ── Gallery-arrival snap ─────────────────────────────────────────────
+       Called when the user arrives from another page via the gallery link.
+       Forces all three scrub timelines to progress(1) INSTANTLY so the
+       scrub-smoothing tweens have zero distance to travel — no animation
+       plays through while the black cover fades out.
+    ── */
+    window._snapAnimationsToGallery = function() {
+      tl0.progress(1);
+      tl2.progress(1);
+      tl3.progress(1);
+      state.logoProgress = 1;
+      state.flow = 0;
+      state.inkR = 0; state.inkG = 0; state.inkB = 0;
+    };
 
 
   }
 
   /* ── "gallery" button → scroll to gallery ── */
-  document.getElementById('nav-works').addEventListener('click', function(e) {
+  document.getElementById('nav-projects').addEventListener('click', function(e) {
     e.preventDefault();
     var g = document.getElementById('gallery');
     smoothScroll(g.offsetTop, 2500);
@@ -738,12 +777,12 @@
 
   var heroData = [
     {
-      src:   'karma/karmacompressed.mp4',
+      src:   'https://res.cloudinary.com/dxi8rxodp/video/upload/v1780927141/karmacompressed_n3p6gi.mp4',
       label: 'agency production 001',
       desc:  'Our first agency production. Shot over three days in an industrial space — a raw study of movement and kinetic energy.'
     },
     {
-      src:   'zvuk/Untitled%20design.mp4',
+      src:   'https://res.cloudinary.com/dxi8rxodp/video/upload/v1780927050/Untitled_design_qrgjmn.mp4',
       label: 'agency production 002',
       desc:  'A self-contained world of sound and image, built entirely by Kilian Conrad. Sparse, deliberate, and entirely its own.'
     }
@@ -1073,6 +1112,9 @@
   document.addEventListener('dragstart',function(e){
     if(['IMG','VIDEO'].indexOf(e.target.tagName)>-1)e.preventDefault();
   });
+  var s=document.createElement('style');
+  s.textContent='img,video,canvas{-webkit-touch-callout:none;user-select:none;-webkit-user-select:none;}';
+  document.head.appendChild(s);
 })();
 </script>
 </body>

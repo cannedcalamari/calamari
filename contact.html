@@ -169,8 +169,8 @@
 
 <nav>
   <a href="index.html" class="tl" id="nav-gallery">gallery</a>
-  <a href="video.html" class="tr" id="nav-video">works</a>
-  <a href="photo.html" class="bl" id="nav-about">who we are</a>
+  <a href="video.html" class="tr" id="nav-video">projects</a>
+  <a href="photo.html" class="bl" id="nav-about">about us</a>
   <a href="contact.html" class="br">talk to us</a>
 </nav>
 
@@ -225,7 +225,7 @@
     var nav = document.querySelector('nav'); if (nav) nav.style.display = 'none';
     var lb = document.getElementById('nav-logo-btn'); if (lb) lb.style.display = 'none';
     var bar = document.createElement('div'); bar.id = 'easy-nav';
-    var links = '<a href="video.html">works</a><a href="photo.html">who we are</a><a href="contact.html">talk to us</a>';
+    var links = '<a href="video.html">projects</a><a href="photo.html">about us</a><a href="contact.html">talk to us</a>';
     if (!isMobile) { links += '<a id="easy-full-site" href="#">full site</a>'; }
     bar.innerHTML = '<img src="calamari-symbol-negative.svg" id="easy-nav-logo" alt=""><div id="easy-nav-links">' + links + '</div>';
     document.body.insertBefore(bar, document.body.firstChild);
@@ -396,6 +396,13 @@
   gsap.to(cover, { opacity: 0, duration: 0.4, ease: 'power2.out', delay: 0.05,
     onComplete: function() { cover.style.display = 'none'; }
   });
+  window.addEventListener('pageshow', function(e) {
+    if (!e.persisted) return;
+    cover.style.display = ''; cover.style.opacity = '1';
+    gsap.to(cover, { opacity: 0, duration: 0.4, ease: 'power2.out', delay: 0.05,
+      onComplete: function() { cover.style.display = 'none'; }
+    });
+  });
 
   function fadeOut(dest) {
     cover.style.display = '';
@@ -421,6 +428,9 @@
   document.addEventListener('dragstart',function(e){
     if(['IMG','VIDEO'].indexOf(e.target.tagName)>-1)e.preventDefault();
   });
+  var s=document.createElement('style');
+  s.textContent='img,video,canvas{-webkit-touch-callout:none;user-select:none;-webkit-user-select:none;}';
+  document.head.appendChild(s);
 })();
 
 (function(){
