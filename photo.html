@@ -255,5 +255,16 @@
 })();
 </script>
 
+
+<script>
+(function(){
+  document.addEventListener('contextmenu',function(e){
+    if(['IMG','VIDEO','CANVAS'].indexOf(e.target.tagName)>-1)e.preventDefault();
+  });
+  document.addEventListener('dragstart',function(e){
+    if(['IMG','VIDEO'].indexOf(e.target.tagName)>-1)e.preventDefault();
+  });
+})();
+</script>
 </body>
 </html>
