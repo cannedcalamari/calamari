@@ -74,12 +74,12 @@
   /* ── Project row — desktop grid: text left, preview right ── */
   .project-row {
     display: grid;
-    grid-template-columns: 1fr clamp(180px, 24vw, 360px);
+    grid-template-columns: 1fr clamp(260px, 34vw, 520px);
     grid-template-rows: auto auto;
     align-items: center;
-    padding: clamp(48px, 8vh, 100px) clamp(40px, 5.5vw, 88px);
+    padding: clamp(48px, 8vh, 100px) clamp(8vw, 12vw, 18vw);
     column-gap: clamp(32px, 4vw, 64px);
-    row-gap: clamp(8px, 1.2vh, 14px);
+    row-gap: 4px;
   }
   .project-row[data-href] { cursor: pointer; }
   .project-row[data-href]:hover .project-preview { opacity: 0.85; }
