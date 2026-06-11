@@ -5,6 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Calamari Collective</title>
   <script>(function(){if(/Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){window.location.replace('video.html');}})();</script>
+  <script>
+    if ('connection' in navigator) {
+      var conn = navigator.connection;
+      var slowConnection = conn.saveData ||
+        conn.effectiveType === '2g' ||
+        conn.effectiveType === 'slow-2g';
+
+      if (slowConnection) {
+        localStorage.setItem('easyMode', '1');
+        window.location.replace('video.html');
+      }
+    }
+  </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { height: 100%; }
