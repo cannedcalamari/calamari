@@ -275,11 +275,11 @@
 
 <div id="gallery">
   <!-- row 1 -->
-  <div class="tile l"><img src="https://res.cloudinary.com/dxi8rxodp/image/upload/v1780926693/DSC00011-2_ujth7e.png"  alt="" loading="lazy"></div>
-  <div class="tile l"><video src="https://res.cloudinary.com/dxi8rxodp/video/upload/v1780927141/karmacompressed_n3p6gi.mp4" muted loop playsinline preload="none"></video></div>
-  <div class="tile p"><img src="https://res.cloudinary.com/dxi8rxodp/image/upload/v1780926685/DSC003622_ypfpax.png"   alt="" loading="lazy"></div>
-  <div class="tile l"><img src="https://res.cloudinary.com/dxi8rxodp/image/upload/v1780926683/DSC003612_ertb8a.png"   alt="" loading="lazy"></div>
-  <div class="tile l"><video src="https://res.cloudinary.com/dxi8rxodp/video/upload/v1780927050/Untitled_design_qrgjmn.mp4" muted loop playsinline preload="none"></video></div>
+  <div class="tile l" id="loader-row1-0"><img src="https://res.cloudinary.com/dxi8rxodp/image/upload/v1780926693/DSC00011-2_ujth7e.png"  alt=""></div>
+  <div class="tile l" id="loader-row1-1"><video src="https://res.cloudinary.com/dxi8rxodp/video/upload/v1780927141/karmacompressed_n3p6gi.mp4" muted loop playsinline preload="metadata"></video></div>
+  <div class="tile p" id="loader-row1-2"><img src="https://res.cloudinary.com/dxi8rxodp/image/upload/v1780926685/DSC003622_ypfpax.png"   alt=""></div>
+  <div class="tile l" id="loader-row1-3"><img src="https://res.cloudinary.com/dxi8rxodp/image/upload/v1780926683/DSC003612_ertb8a.png"   alt=""></div>
+  <div class="tile l" id="loader-row1-4"><video src="https://res.cloudinary.com/dxi8rxodp/video/upload/v1780927050/Untitled_design_qrgjmn.mp4" muted loop playsinline preload="metadata"></video></div>
 
   <!-- row 2: 1121=portrait(3:4), 848=portrait(3:4) -->
   <div class="tile p"><img src="https://res.cloudinary.com/dxi8rxodp/image/upload/v1780926677/DSC00402_x5uzre.png"    alt="" loading="lazy"></div>
@@ -371,16 +371,41 @@
     /* WebGL first frame ready → ~75% (called from the canvas render loop) */
     window._loaderWebGLReady = function() { bump(75); };
 
-    /* hero video ready → 100% */
+    /* hero video ready → ~80% */
     var heroVideo = document.getElementById('hero-video-main');
     if (heroVideo) {
       if (heroVideo.readyState >= 2) {
-        bump(100);
+        bump(80);
       } else {
-        heroVideo.addEventListener('loadeddata', function() { bump(100); }, { once: true });
+        heroVideo.addEventListener('loadeddata', function() { bump(80); }, { once: true });
       }
     } else {
+      bump(80);
+    }
+
+    /* first row of gallery previews ready → 100% */
+    var row1 = document.querySelectorAll('[id^="loader-row1-"]');
+    var row1Pending = row1.length;
+    function row1ItemReady() {
+      row1Pending--;
+      if (row1Pending <= 0) bump(100);
+    }
+    if (row1Pending === 0) {
       bump(100);
+    } else {
+      row1.forEach(function(tile) {
+        var media = tile.querySelector('img, video');
+        if (!media) { row1ItemReady(); return; }
+        if (media.tagName === 'IMG') {
+          if (media.complete) row1ItemReady();
+          else media.addEventListener('load', row1ItemReady, { once: true });
+          media.addEventListener('error', row1ItemReady, { once: true });
+        } else {
+          if (media.readyState >= 1) row1ItemReady();
+          else media.addEventListener('loadedmetadata', row1ItemReady, { once: true });
+          media.addEventListener('error', row1ItemReady, { once: true });
+        }
+      });
     }
 
     /* hard cap: 2.5s, then finish regardless */
@@ -709,6 +734,23 @@
 
     var sections = document.querySelectorAll('.section');
 
+    /* ── Logo position: single continuous scrub across sections 0–2 ──
+       Driving state.logoProgress from two separate ScrollTrigger-scrubbed
+       timelines (tl0 and tl2) caused visible glitches when scrolling
+       quickly back and forth across their boundary, since both tweens
+       fought over the same property. One combined timeline fixes this. */
+    var tlLogo = gsap.timeline({
+      scrollTrigger: {
+        trigger:    sections[0],
+        endTrigger: sections[2],
+        start: 'top top',
+        end:   'bottom top',
+        scrub: 0.4
+      }
+    });
+    tlLogo.to(state, { logoProgress: 0, ease: 'power2.inOut', duration: 1 }, 0);
+    tlLogo.to(state, { logoProgress: 1, ease: 'power2.inOut', duration: 2 }, 1);
+
     /* ── State 0→1: hero video → main logo (sections[0], 0vh→100vh) ─── */
     var tl0 = gsap.timeline({
       scrollTrigger: {
@@ -718,7 +760,6 @@
         scrub: 0.5
       }
     });
-    tl0.to(state, { logoProgress: 0, ease: 'power2.inOut', duration: 1 }, 0);
     tl0.to(state, { flow: 1.0, ease: 'power2.in',  duration: 0.5 }, 0)
        .to(state, { flow: 0.0, ease: 'power2.out', duration: 0.5 }, 0.5);
     tl0.to(state, { inkR: 0, inkG: 0, inkB: 0, ease: 'power1.inOut', duration: 1 }, 0);
@@ -743,7 +784,6 @@
       }
     });
 
-    tl2.to(state, { logoProgress: 1, ease: 'power2.inOut', duration: 1 }, 0);
     tl2.to(state, { flow: 1.0, ease: 'power2.in',  duration: 0.5 }, 0)
        .to(state, { flow: 0.0, ease: 'power2.out', duration: 0.5 }, 0.5);
 
@@ -796,6 +836,7 @@
        plays through while the black cover fades out.
     ── */
     window._snapAnimationsToGallery = function() {
+      tlLogo.progress(1);
       tl0.progress(1);
       tl2.progress(1);
       tl3.progress(1);
