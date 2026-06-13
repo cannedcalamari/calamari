@@ -14,10 +14,27 @@
     min-height: 100vh;
   }
 
-  /* ── Page cover ── */
+  /* ── Page cover / loading screen ── */
   #page-cover {
-    position: fixed; inset: 0; background: #000;
+    position: fixed; inset: 0; background: #fff;
     z-index: 9999; pointer-events: none;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+  }
+  #loader-logo {
+    width: 80px; height: auto; display: block;
+    filter: brightness(0);
+    animation: loaderPulse 1.2s ease-in-out infinite;
+  }
+  #loader-percent {
+    margin-top: 16px;
+    font-size: 11px; font-weight: 400;
+    letter-spacing: 0.15em; text-transform: lowercase;
+    color: rgba(0,0,0,0.4);
+  }
+  @keyframes loaderPulse {
+    0%, 100% { transform: scale(1); opacity: 0.7; }
+    50%      { transform: scale(1.08); opacity: 1; }
   }
 
   /* content scrolls, top-bar clips it */
@@ -193,7 +210,10 @@
 </head>
 <body>
 
-<div id="page-cover"></div>
+<div id="page-cover">
+  <img id="loader-logo" src="calamari-symbol-negative.svg" alt="">
+  <span id="loader-percent">0%</span>
+</div>
 <div id="top-bar"></div>
 
 <nav>
@@ -311,11 +331,63 @@
     });
   })();
 
-  /* ── Entrance ── */
+  /* ── Loading screen: percent counter tied to real readiness, then fade ── */
   var cover = document.getElementById('page-cover');
-  gsap.to(cover, { opacity: 0, duration: 0.5, ease: 'power2.out', delay: 0.05,
-    onComplete: function() { cover.style.display = 'none'; }
-  });
+  var percentEl = document.getElementById('loader-percent');
+
+  var display = 0, target = 0, finished = false;
+  function bump(p) { if (p > target) target = p; }
+
+  var tick = setInterval(function() {
+    if (target < 90) target = Math.min(target + 2, 90);
+    if (display < target) {
+      var step = Math.max(1, Math.round((target - display) * 0.15));
+      display = Math.min(display + step, target, 100);
+      percentEl.textContent = display + '%';
+    }
+    if (display >= 100 && !finished) {
+      finished = true;
+      clearInterval(tick);
+      setTimeout(runFadeOut, 150);
+    }
+  }, 35);
+
+  /* fonts ready → ~40% */
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(function() { bump(40); });
+  } else {
+    bump(40);
+  }
+
+  /* WebGL first frame ready → ~75% (called from the canvas render loop) */
+  window._loaderWebGLReady = function() { bump(75); };
+
+  /* project preview videos ready → 100% */
+  var previewVideos = document.querySelectorAll('.project-preview video');
+  var previewPending = previewVideos.length;
+  function previewItemReady() {
+    previewPending--;
+    if (previewPending <= 0) bump(100);
+  }
+  if (previewPending === 0) {
+    bump(100);
+  } else {
+    previewVideos.forEach(function(v) {
+      if (v.readyState >= 2) previewItemReady();
+      else v.addEventListener('loadeddata', previewItemReady, { once: true });
+      v.addEventListener('error', previewItemReady, { once: true });
+    });
+  }
+
+  /* hard cap: 2.5s, then finish regardless */
+  setTimeout(function() { bump(100); }, 2500);
+
+  function runFadeOut() {
+    gsap.to(cover, { opacity: 0, duration: 0.5, ease: 'power2.out',
+      onComplete: function() { cover.style.display = 'none'; }
+    });
+  }
+
   window.addEventListener('pageshow', function(e) {
     if (!e.persisted) return;
     cover.style.display = ''; cover.style.opacity = '1';
@@ -397,7 +469,10 @@
 
   var gl = cvs.getContext('webgl', { alpha: true, premultipliedAlpha: false })
           || cvs.getContext('experimental-webgl', { alpha: true, premultipliedAlpha: false });
-  if (!gl) return;
+  if (!gl) {
+    if (window._loaderWebGLReady) window._loaderWebGLReady();
+    return;
+  }
 
   document.querySelector('#nav-logo img').style.display = 'none';
 
@@ -504,6 +579,11 @@
     gl.uniform2f(uLogoMax_loc, (logoX + logoW) / w, 1 - logoY / h);
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+    if (window._loaderWebGLReady) {
+      window._loaderWebGLReady();
+      window._loaderWebGLReady = null;
+    }
   })();
 })();
 </script>
