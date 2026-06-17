@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Calamari Collective — About Us</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <style>
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
   html, body { height: 100%; }
@@ -34,67 +35,88 @@
   .tl { top: 0; left: 0; } .tr { top: 0; right: 0; }
   .bl { bottom: 0; left: 0; } .br { bottom: 0; right: 0; }
 
-  /* ── Main content ── */
-  main {
-    position: relative; z-index: 2;
-    padding-top: clamp(100px, 14vh, 160px);
-  }
+  /* ── Main ── */
+  main { position: relative; z-index: 2; }
 
-  /* ── Section label (shared) ── */
+  /* ── Section label ── */
   .section-label {
     font-size: clamp(9px, 0.75vw, 11px);
     letter-spacing: 0.18em; text-transform: uppercase;
-    color: rgba(0,0,0,0.35);
-    display: block;
+    color: rgba(0,0,0,0.35); display: block;
     margin-bottom: clamp(16px, 2.5vh, 24px);
   }
 
-  /* ── Section 1: Intro ── */
+  /* ── Intro ── */
   .intro {
     text-align: center;
-    padding: clamp(40px, 8vh, 100px) clamp(24px, 8vw, 120px) clamp(80px, 12vh, 140px);
+    padding: clamp(120px, 18vh, 200px) clamp(24px, 8vw, 120px) clamp(80px, 12vh, 140px);
   }
   .intro-heading {
-    font-size: clamp(14px, 1.3vw, 20px);
-    font-weight: 400; letter-spacing: 0.01em;
-    color: #000;
+    font-size: clamp(15px, 1.4vw, 22px);
+    font-weight: 400; letter-spacing: 0.01em; color: #000;
     margin-bottom: clamp(10px, 1.5vh, 16px);
   }
   .intro-subline {
     font-size: clamp(11px, 0.9vw, 14px);
-    font-weight: 400; letter-spacing: 0.01em;
-    color: rgba(0,0,0,0.35);
+    font-weight: 400; letter-spacing: 0.01em; color: rgba(0,0,0,0.35);
   }
 
-  /* ── Section 2: Story ── */
-  .story {
-    padding: 0 clamp(24px, 8vw, 120px) clamp(80px, 12vh, 140px);
-  }
-  .story-text {
-    font-size: clamp(13px, 1.05vw, 16px);
-    line-height: 1.85; color: rgba(0,0,0,0.55);
-    max-width: 640px;
-  }
-
-  /* ── Section 3: Photo strip ── */
-  .photo-strip {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: clamp(6px, 0.8vw, 12px);
-    padding: 0 clamp(24px, 5vw, 80px);
-    margin-bottom: clamp(80px, 12vh, 140px);
-  }
-  .photo-strip-item {
-    aspect-ratio: 4/5;
+  /* ── Full-bleed hero image ── */
+  .photo-hero {
+    width: 100%;
+    height: clamp(340px, 72vh, 700px);
     overflow: hidden;
-    background: #e0e0e0;
+    margin-bottom: clamp(80px, 14vh, 160px);
   }
-  .photo-strip-item img {
+  .photo-hero-inner {
+    width: 100%; height: 140%;
+    margin-top: -20%;
+    will-change: transform;
+  }
+  .photo-hero-inner img {
     width: 100%; height: 100%;
     object-fit: cover; display: block;
   }
 
-  /* ── Section 4: Team ── */
+  /* ── Story ── */
+  .story {
+    padding: 0 clamp(24px, 8vw, 120px) clamp(80px, 14vh, 160px);
+  }
+  .story-text {
+    font-size: clamp(13px, 1.05vw, 16px);
+    line-height: 1.85; color: rgba(0,0,0,0.55);
+    max-width: 600px;
+  }
+
+  /* ── Asymmetric photo pair ── */
+  .photo-pair {
+    display: grid;
+    grid-template-columns: 58fr 36fr;
+    gap: clamp(10px, 1.8vw, 26px);
+    padding: 0 clamp(24px, 5vw, 72px);
+    margin-bottom: clamp(100px, 16vh, 180px);
+    align-items: start;
+  }
+  .photo-pair-left,
+  .photo-pair-right {
+    overflow: hidden;
+  }
+  .photo-pair-left { aspect-ratio: 3/4; }
+  .photo-pair-right {
+    aspect-ratio: 4/5;
+    margin-top: clamp(60px, 14vh, 160px);
+  }
+  .photo-inner {
+    width: 100%; height: 140%;
+    margin-top: -20%;
+    will-change: transform;
+  }
+  .photo-inner img {
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+  }
+
+  /* ── Team ── */
   .team {
     padding: 0 clamp(24px, 8vw, 120px) clamp(80px, 12vh, 140px);
   }
@@ -120,7 +142,7 @@
     line-height: 1.75; color: rgba(0,0,0,0.5);
   }
 
-  /* ── Section 5: Closing ── */
+  /* ── Closing ── */
   .closing {
     text-align: center;
     padding: clamp(40px, 6vh, 80px) clamp(24px, 8vw, 120px) clamp(100px, 14vh, 160px);
@@ -132,11 +154,12 @@
 
   /* ── Mobile ── */
   @media (max-width: 768px) {
-    .photo-strip {
+    .photo-pair {
       grid-template-columns: 1fr;
       padding: 0 clamp(18px, 5vw, 28px);
     }
-    .photo-strip-item { aspect-ratio: 4/3; }
+    .photo-pair-right { margin-top: clamp(10px, 3vw, 18px); aspect-ratio: 4/3; }
+    .photo-pair-left { aspect-ratio: 4/3; }
     .team-grid {
       grid-template-columns: 1fr;
       gap: clamp(36px, 6vh, 52px);
@@ -158,26 +181,36 @@
 
 <main>
 
-  <!-- Section 1 — Intro -->
+  <!-- Intro -->
   <section class="intro">
     <p class="intro-heading">we are keen to work with you.</p>
     <p class="intro-subline">that's all that matters.</p>
   </section>
 
-  <!-- Section 2 — Our story -->
+  <!-- Full-bleed hero image with parallax -->
+  <div class="photo-hero">
+    <div class="photo-hero-inner">
+      <img src="KARMA__behindthescenes-022.jpg" alt="">
+    </div>
+  </div>
+
+  <!-- Story -->
   <section class="story">
     <span class="section-label">our story</span>
     <p class="story-text">Calamari Collective started as three friends who couldn't stop pointing a camera at each other. What began as documenting climbing trips turned into a shared obsession with image and motion — somewhere between sport, story, and a slightly chaotic sense of humour. We're still figuring it out, one production at a time.</p>
   </section>
 
-  <!-- Section 3 — Behind the scenes photo strip -->
-  <div class="photo-strip">
-    <div class="photo-strip-item"><img src="KARMA__behindthescenes-009.jpg" alt="Behind the scenes"></div>
-    <div class="photo-strip-item"><img src="KARMA__behindthescenes-022.jpg" alt="Behind the scenes"></div>
-    <div class="photo-strip-item"><img src="KARMA__behindthescenes-042.jpg" alt="Behind the scenes"></div>
+  <!-- Asymmetric photo pair with parallax -->
+  <div class="photo-pair">
+    <div class="photo-pair-left">
+      <div class="photo-inner"><img src="KARMA__behindthescenes-009.jpg" alt=""></div>
+    </div>
+    <div class="photo-pair-right">
+      <div class="photo-inner"><img src="KARMA__behindthescenes-042.jpg" alt=""></div>
+    </div>
   </div>
 
-  <!-- Section 4 — The team -->
+  <!-- Team -->
   <section class="team">
     <span class="section-label">who we are</span>
     <div class="team-grid">
@@ -199,7 +232,7 @@
     </div>
   </section>
 
-  <!-- Section 5 — Closing -->
+  <!-- Closing -->
   <section class="closing">
     <p class="closing-text">more coming soon</p>
   </section>
@@ -391,6 +424,78 @@
   document.getElementById('nav-gallery').addEventListener('click', function(e) { e.preventDefault(); sessionStorage.setItem('scrollToGallery','1'); fadeOut('index.html'); });
   document.getElementById('nav-video').addEventListener('click',   function(e) { e.preventDefault(); fadeOut('video.html'); });
   document.getElementById('nav-contact').addEventListener('click', function(e) { e.preventDefault(); fadeOut('contact.html'); });
+
+  /* ── Scroll animations ── */
+  gsap.registerPlugin(ScrollTrigger);
+
+  var isMobileAnim = window.matchMedia('(max-width: 768px)').matches;
+
+  /* Intro text — fade up after cover lifts */
+  gsap.set('.intro-heading', { opacity: 0, y: 22 });
+  gsap.set('.intro-subline', { opacity: 0, y: 22 });
+  gsap.to(['.intro-heading', '.intro-subline'], {
+    opacity: 1, y: 0, duration: 0.9, stagger: 0.16, ease: 'power2.out', delay: 0.45
+  });
+
+  /* Hero image parallax */
+  gsap.to('.photo-hero-inner', {
+    yPercent: 18,
+    ease: 'none',
+    scrollTrigger: {
+      trigger: '.photo-hero',
+      start: 'top bottom',
+      end: 'bottom top',
+      scrub: true
+    }
+  });
+
+  /* Section labels — slide in from left */
+  document.querySelectorAll('.section-label').forEach(function(el) {
+    gsap.set(el, { opacity: 0, x: -14 });
+    gsap.to(el, {
+      opacity: 1, x: 0, duration: 0.55, ease: 'power2.out',
+      scrollTrigger: { trigger: el, start: 'top 88%' }
+    });
+  });
+
+  /* Story text — fade up */
+  gsap.set('.story-text', { opacity: 0, y: 32 });
+  gsap.to('.story-text', {
+    opacity: 1, y: 0, duration: 0.85, ease: 'power2.out',
+    scrollTrigger: { trigger: '.story-text', start: 'top 84%' }
+  });
+
+  /* Photo pair — each image moves at a different parallax speed */
+  if (!isMobileAnim) {
+    gsap.to('.photo-pair-left .photo-inner', {
+      yPercent: 14,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '.photo-pair',
+        start: 'top bottom',
+        end: 'bottom top',
+        scrub: true
+      }
+    });
+    gsap.to('.photo-pair-right .photo-inner', {
+      yPercent: 8,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '.photo-pair',
+        start: 'top bottom',
+        end: 'bottom top',
+        scrub: true
+      }
+    });
+  }
+
+  /* Team members — stagger fade up */
+  gsap.set('.team-member', { opacity: 0, y: 28 });
+  gsap.to('.team-member', {
+    opacity: 1, y: 0, duration: 0.7, stagger: 0.13, ease: 'power2.out',
+    scrollTrigger: { trigger: '.team-grid', start: 'top 82%' }
+  });
+
 })();
 </script>
 
