@@ -150,42 +150,45 @@
     background-size: 40px 40px;
   }
 
-  /* ── Fullscreen preview ── */
-  .expand-btn {
-    position: absolute; top: 8px; left: 8px; z-index: 2;
-    width: 28px; height: 28px;
-    background: rgba(0,0,0,0.45);
-    border: none; border-radius: 4px;
-    display: none;
-    align-items: center; justify-content: center;
-    cursor: pointer; padding: 0;
-  }
-  .expand-btn svg { width: 14px; height: 14px; }
-  .fullscreen-viewer {
-    position: fixed; inset: 0; z-index: 500;
-    background: #000;
-    display: none;
-    align-items: center; justify-content: center;
-  }
-  .fullscreen-viewer.active { display: flex; }
-  .fullscreen-content img,
-  .fullscreen-content video {
-    max-width: 100%; max-height: 100%;
-    width: auto; height: auto;
-    display: block;
-  }
-  .fullscreen-close {
-    position: absolute; top: 16px; left: 16px; z-index: 501;
-    width: 36px; height: 36px;
-    background: rgba(255,255,255,0.12);
-    border: none; border-radius: 50%;
+  /* ── Lightbox ── */
+  #lightbox {
+    position: fixed; inset: 0; z-index: 9000;
+    background: #fff;
     display: flex; align-items: center; justify-content: center;
-    cursor: pointer;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s ease;
   }
-  .fullscreen-close svg { width: 16px; height: 16px; }
+  #lightbox.open { opacity: 1; pointer-events: all; }
+  #lb-container {
+    display: flex; flex-direction: column; align-items: stretch;
+    max-width: 90vw;
+  }
+  #lb-controls {
+    display: none; flex-direction: column;
+    gap: 10px; margin-top: 14px;
+  }
+  #lb-progress-track {
+    width: 100%; height: 1px;
+    background: rgba(0,0,0,0.12); position: relative;
+  }
+  #lb-progress-fill {
+    position: absolute; left: 0; top: 0; bottom: 0;
+    width: 0%; background: #000;
+    transition: width 0.25s linear;
+  }
+  #lb-ctrl-row {
+    display: flex; justify-content: flex-end; gap: clamp(16px, 2vw, 28px);
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: 300; font-size: clamp(10px, 0.85vw, 12px);
+    letter-spacing: 0.1em; text-transform: lowercase; color: #000;
+  }
+  #lb-play-btn, #lb-sound-btn {
+    cursor: pointer; transition: color 0.2s; user-select: none;
+  }
+  #lb-play-btn:hover, #lb-sound-btn:hover { color: rgba(0,0,0,0.35); }
+  .hero, .media-card { cursor: pointer; }
 
   @media (max-width: 768px) {
-    .expand-btn { display: flex; }
     .hero {
       height: 50vh;
     }
@@ -227,7 +230,7 @@
 </nav>
 
 <div class="hero">
-  <video src="https://res.cloudinary.com/dxi8rxodp/video/upload/v1780927050/Untitled_design_qrgjmn.mp4" autoplay muted loop playsinline preload="metadata" style="width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;"></video>
+  <video src="https://res.cloudinary.com/dxi8rxodp/video/upload/v1780927050/Untitled_design_qrgjmn.mp4" autoplay muted loop playsinline preload="metadata" style="width:100%;height:100%;object-fit:cover;display:block;"></video>
 </div>
 
 <main>
@@ -275,9 +278,16 @@
   </div>
 </div>
 
-<div class="fullscreen-viewer">
-  <button class="fullscreen-close" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-  <div class="fullscreen-content"></div>
+<div id="lightbox">
+  <div id="lb-container">
+    <div id="lb-controls">
+      <div id="lb-progress-track"><div id="lb-progress-fill"></div></div>
+      <div id="lb-ctrl-row">
+        <span id="lb-play-btn">pause</span>
+        <span id="lb-sound-btn">sound off</span>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -342,46 +352,83 @@
     e.preventDefault(); fadeOut('contact.html');
   });
 
-  /* ── Fullscreen preview ── */
-  var viewer = document.querySelector('.fullscreen-viewer');
-  var viewerContent = viewer.querySelector('.fullscreen-content');
-  var viewerClose = viewer.querySelector('.fullscreen-close');
+  /* ── Lightbox ── */
+  var lightbox    = document.getElementById('lightbox');
+  var lbContainer = document.getElementById('lb-container');
+  var lbControls  = document.getElementById('lb-controls');
+  var lbProgress  = document.getElementById('lb-progress-fill');
+  var lbPlayBtn   = document.getElementById('lb-play-btn');
+  var lbSoundBtn  = document.getElementById('lb-sound-btn');
+  var lbVideo = null, lbMediaEl = null;
 
-  function openViewer(media) {
-    viewerContent.innerHTML = '';
-    if (media.tagName === 'IMG') {
-      var img = document.createElement('img');
-      img.src = media.src; img.alt = '';
-      viewerContent.appendChild(img);
+  function openLightbox(srcEl) {
+    if (lbMediaEl) { lbMediaEl.remove(); lbMediaEl = null; }
+    if (srcEl.tagName === 'VIDEO') {
+      lbVideo = document.createElement('video');
+      lbVideo.src = srcEl.currentSrc || srcEl.src;
+      lbVideo.autoplay = true; lbVideo.loop = true; lbVideo.muted = false;
+      lbVideo.style.cssText = 'display:block;max-height:80vh;max-width:90vw;object-fit:contain;';
+      lbContainer.insertBefore(lbVideo, lbControls);
+      lbMediaEl = lbVideo;
+      lbProgress.style.width = '0%';
+      lbPlayBtn.textContent  = 'pause';
+      lbSoundBtn.textContent = 'sound off';
+      lbControls.style.display = 'flex';
+      lbVideo.addEventListener('timeupdate', function() {
+        if (lbVideo.duration) lbProgress.style.width = (lbVideo.currentTime / lbVideo.duration * 100) + '%';
+      });
+      lbVideo.addEventListener('play',  function() { lbPlayBtn.textContent = 'pause'; });
+      lbVideo.addEventListener('pause', function() { lbPlayBtn.textContent = 'play'; });
+      lbVideo.play().catch(function() {});
     } else {
-      var vid = document.createElement('video');
-      vid.src = media.currentSrc || media.src;
-      vid.autoplay = true; vid.muted = true; vid.loop = true; vid.playsInline = true;
-      viewerContent.appendChild(vid);
+      var el = document.createElement('img');
+      el.src = srcEl.src; el.alt = '';
+      el.style.cssText = 'display:block;max-height:80vh;max-width:90vw;object-fit:contain;';
+      lbContainer.insertBefore(el, lbControls);
+      lbMediaEl = el;
+      lbControls.style.display = 'none';
+      lbVideo = null;
     }
-    viewer.classList.add('active');
+    lightbox.classList.add('open');
     document.body.style.overflow = 'hidden';
   }
-  function closeViewer() {
-    viewer.classList.remove('active');
-    viewerContent.innerHTML = '';
+
+  function closeLightbox() {
+    lightbox.classList.remove('open');
     document.body.style.overflow = '';
+    if (lbVideo) { lbVideo.pause(); lbVideo = null; }
+    if (lbMediaEl) { lbMediaEl.remove(); lbMediaEl = null; }
   }
-  viewerClose.addEventListener('click', closeViewer);
-  viewer.addEventListener('click', function(e) {
-    if (e.target === viewer) closeViewer();
+
+  lightbox.addEventListener('click', function(e) {
+    if (!e.target.closest('#lb-container')) closeLightbox();
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeLightbox();
+  });
+  lbPlayBtn.addEventListener('click', function() {
+    if (!lbVideo) return;
+    if (lbVideo.paused) lbVideo.play().catch(function() {}); else lbVideo.pause();
+  });
+  lbSoundBtn.addEventListener('click', function() {
+    if (!lbVideo) return;
+    lbVideo.muted = !lbVideo.muted;
+    lbSoundBtn.textContent = lbVideo.muted ? 'sound on' : 'sound off';
   });
 
+  /* Hero click */
+  var heroMedia = document.querySelector('.hero video, .hero img');
+  if (heroMedia) heroMedia.addEventListener('click', function() { openLightbox(heroMedia); });
+
+  /* Media card clicks — guard against drag-scroll */
+  var dragMoved = false;
   document.querySelectorAll('.media-card').forEach(function(card) {
-    var btn = document.createElement('button');
-    btn.className = 'expand-btn';
-    btn.setAttribute('aria-label', 'Expand');
-    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>';
-    card.appendChild(btn);
-    btn.addEventListener('click', function(e) {
-      e.preventDefault(); e.stopPropagation();
+    card.addEventListener('mousedown', function() { dragMoved = false; });
+    card.addEventListener('mousemove', function() { dragMoved = true; });
+    card.addEventListener('click', function() {
+      if (dragMoved) return;
       var media = card.querySelector('img, video');
-      if (media) openViewer(media);
+      if (media) openLightbox(media);
     });
   });
 
