@@ -416,13 +416,9 @@
   var heroMedia = document.querySelector('.hero video, .hero img');
   if (heroMedia) heroMedia.addEventListener('click', function() { openLightbox(heroMedia); });
 
-  /* Media card clicks — guard against drag-scroll */
-  var dragMoved = false;
+  /* Media card clicks */
   document.querySelectorAll('.media-card').forEach(function(card) {
-    card.addEventListener('mousedown', function() { dragMoved = false; });
-    card.addEventListener('mousemove', function() { dragMoved = true; });
     card.addEventListener('click', function() {
-      if (dragMoved) return;
       var media = card.querySelector('img, video');
       if (media) openLightbox(media);
     });
