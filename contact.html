@@ -140,15 +140,10 @@
   button[type="submit"]:hover { border-color: rgba(255,255,255,0.6); color: #fff; }
 
   /* ── Info panel ── */
-  .info-cols {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0 clamp(16px, 3vw, 40px);
-    width: 100%;
-  }
-  .info-col-right { padding-top: clamp(28px, 4vh, 52px); }
-  .info-section { display: flex; flex-direction: column; gap: 2px; margin-bottom: clamp(36px, 5.5vh, 70px); }
+  .info-list { display: flex; flex-direction: column; width: 100%; }
+  .info-section { display: flex; flex-direction: column; gap: 2px; margin-bottom: clamp(48px, 7vh, 90px); }
   .info-section:last-child { margin-bottom: 0; }
+  .info-section.right { align-self: flex-end; text-align: right; }
   .info-value {
     font-size: clamp(11px, 0.88vw, 14px);
     color: rgba(255,255,255,0.7);
@@ -191,31 +186,27 @@
 
     <!-- Right: info -->
     <div class="c-panel">
-      <div class="info-cols">
-        <div class="info-col-left">
-          <div class="info-section">
-            <span class="info-value">Lysander Naimji</span>
-            <span class="info-value"><a href="tel:+420732117375">+420 732 117 375</a></span>
-          </div>
-          <div class="info-section">
-            <span class="info-value">Kilian Conrad</span>
-            <span class="info-value"><a href="tel:+27826038213">+27 82 603 8213</a></span>
-          </div>
-          <div class="info-section">
-            <span class="info-value">Matyas Monhart</span>
-            <span class="info-value"><a href="tel:+420608856100">+420 608 856 100</a></span>
-          </div>
+      <div class="info-list">
+        <div class="info-section">
+          <span class="info-value">Lysander Naimji</span>
+          <span class="info-value"><a href="tel:+420732117375">+420 732 117 375</a></span>
         </div>
-        <div class="info-col-right">
-          <div class="info-section">
-            <span class="info-value"><a href="mailto:whatsup@calamarivisuals.co">whatsup@calamarivisuals.co</a></span>
-          </div>
-          <div class="info-section">
-            <span class="info-value"><a href="https://instagram.com/calamari_co" target="_blank">@calamari_co</a></span>
-          </div>
-          <div class="info-section">
-            <span class="info-value">Prague, CZ · London, UK</span>
-          </div>
+        <div class="info-section right">
+          <span class="info-value"><a href="mailto:whatsup@calamarivisuals.co">whatsup@calamarivisuals.co</a></span>
+        </div>
+        <div class="info-section">
+          <span class="info-value">Kilian Conrad</span>
+          <span class="info-value"><a href="tel:+27826038213">+27 82 603 8213</a></span>
+        </div>
+        <div class="info-section right">
+          <span class="info-value"><a href="https://instagram.com/calamari_co" target="_blank">@calamari_co</a></span>
+        </div>
+        <div class="info-section">
+          <span class="info-value">Matyas Monhart</span>
+          <span class="info-value"><a href="tel:+420608856100">+420 608 856 100</a></span>
+        </div>
+        <div class="info-section right">
+          <span class="info-value">Prague, CZ · London, UK</span>
         </div>
       </div>
     </div>
