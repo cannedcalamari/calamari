@@ -489,6 +489,14 @@
     });
   }
 
+  /* Logo — hide once hero image scrolls past */
+  ScrollTrigger.create({
+    trigger: '.photo-hero',
+    start: 'bottom center',
+    onEnter: function() { gsap.to('#nav-logo-btn', { opacity: 0, duration: 0.3, ease: 'power1.out', pointerEvents: 'none' }); },
+    onLeaveBack: function() { gsap.to('#nav-logo-btn', { opacity: 1, duration: 0.3, ease: 'power1.out', pointerEvents: 'auto' }); }
+  });
+
   /* Team members — stagger fade up */
   gsap.set('.team-member', { opacity: 0, y: 28 });
   gsap.to('.team-member', {
