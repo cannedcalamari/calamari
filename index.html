@@ -95,11 +95,12 @@
     }
     #hero-preview video { width:100%; height:100%; object-fit:cover; display:block; }
     #hero-preview-label {
-      position: absolute; bottom: 8px; left: 10px;
-      font-size: clamp(9px, 0.75vw, 11px);
-      letter-spacing: 0.14em; text-transform: lowercase;
+      position: absolute; bottom: 8px; left: 10px; right: 10px;
+      font-size: clamp(9px, 0.92vw, 13px);
+      letter-spacing: 0.08em; text-transform: lowercase;
       color: rgba(255,255,255,0.9); font-weight: 400;
       font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      white-space: nowrap;
     }
     #hero-action-label {
       position: fixed; left: 0; top: 0;
@@ -916,12 +917,12 @@
     {
       src:   'https://res.cloudinary.com/dxi8rxodp/video/upload/v1780927141/karmacompressed_n3p6gi.mp4',
       label: 'agency production 001',
-      desc:  'Our first agency production. Shot over three days in an industrial space — a raw study of movement and kinetic energy.'
+      desc:  'Our first agency production. Shot over three days in an industrial space. Capturing raw energy and movement, exactly how it was designed.'
     },
     {
       src:   'https://res.cloudinary.com/dxi8rxodp/video/upload/v1780927050/Untitled_design_qrgjmn.mp4',
       label: 'agency production 002',
-      desc:  'A self-contained world of sound and image, built entirely by Kilian Conrad. Sparse, deliberate, and entirely its own.'
+      desc:  'A self-contained world of sound and image, built entirely by Kilian Conrad. Isolated, but exploding.'
     }
   ];
 
@@ -942,7 +943,7 @@
     var next = heroData[1 - currentHero];
     tooltipLbl.textContent  = cur.label;
     tooltipDesc.textContent = cur.desc;
-    previewLbl.textContent  = next.label;
+    previewLbl.textContent  = 'click for next project';
     previewVid.src = next.src;
   }
 
@@ -1056,8 +1057,7 @@
       preview.style.opacity       = String(alpha);
       preview.style.pointerEvents = alpha > 0.05 ? 'auto' : 'none';
       var coords = posEl(preview, x, y);
-      actionLabel.textContent = 'click for next project';
-      posActionLabel(coords, alpha);
+      actionLabel.style.opacity = '0';
     }
   });
 
