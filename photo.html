@@ -287,7 +287,8 @@
   ctx2d.restore();
 
   const canvas = document.createElement('canvas');
-  canvas.style.cssText = 'position:fixed;inset:0;display:block;pointer-events:none;z-index:1;';
+  canvas.id = 'webgl-logo-canvas';
+  canvas.style.cssText = 'position:fixed;inset:0;display:block;pointer-events:none;z-index:1;transition:opacity 0.3s;';
   document.body.prepend(canvas);
   const gl = canvas.getContext('webgl', { alpha: true, premultipliedAlpha: false })
           || canvas.getContext('experimental-webgl', { alpha: true, premultipliedAlpha: false });
@@ -493,8 +494,8 @@
   ScrollTrigger.create({
     trigger: '.photo-hero',
     start: 'bottom center',
-    onEnter: function() { gsap.to('#nav-logo-btn', { opacity: 0, duration: 0.3, ease: 'power1.out', pointerEvents: 'none' }); },
-    onLeaveBack: function() { gsap.to('#nav-logo-btn', { opacity: 1, duration: 0.3, ease: 'power1.out', pointerEvents: 'auto' }); }
+    onEnter: function() { document.getElementById('webgl-logo-canvas').style.opacity = '0'; },
+    onLeaveBack: function() { document.getElementById('webgl-logo-canvas').style.opacity = '1'; }
   });
 
   /* Team members — stagger fade up */
